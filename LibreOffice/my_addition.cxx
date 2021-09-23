@@ -50,7 +50,7 @@ std::u16string
 const mix = u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 
 bool MyIsAlpha(char16_t letter) {
-    return std::isalpha((unsigned char) letter) || cyrillic.find(letter) != std::string::npos;
+    return std::isalpha(letter) || cyrillic.find(letter) != std::string::npos;
 }
 
 void CreateNewDocument(Reference < XFrame > & rxFrame, int keyboard_layout, int globalWordCnt, int globalWordLenght) {
@@ -169,7 +169,7 @@ bool IsOnlyLatin(OUString curWord) {
         return false;
     }
     for (std::size_t i = 0; i < curWord.getLength(); i++) {
-        if (!std::isalpha(((unsigned char) curWord[i]))) {
+        if (!std::isalpha(curWord[i])) {
             return false;
         }
     }
@@ -177,7 +177,7 @@ bool IsOnlyLatin(OUString curWord) {
 }
 
 bool MyIsAlphaAndDigit(char16_t letter) {
-    return std::isalpha((unsigned char) letter) || cyrillic.find(letter) != std::string::npos || std::isdigit((unsigned char) letter);
+    return std::isalpha(letter) || cyrillic.find(letter) != std::string::npos || std::isdigit((unsigned char) letter);
 }
 
 
