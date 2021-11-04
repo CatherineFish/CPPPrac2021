@@ -1,3 +1,5 @@
+#include <cmath>
+
 class solution
 {
 
@@ -7,10 +9,19 @@ class solution
 class temperature
 {
 private:
-	double temp;
+	double initTemp, curTemp;
 	
 public:
-	temperature(double temp_) : temp(temp_) {}
+	temperature(double temp_) : initTemp(temp_), curTemp(temp_) {}
+	double getTemp ()
+	{
+		return curTemp;
+	}
+	void decreaseTemp(int iteration)
+	{
+		curTemp = initTemp / log (1 + iteration);
+		return; 
+	}
 };
 
 
@@ -20,15 +31,18 @@ class mainAlgoritnhm
 private:
 	solution* curSol, bestSol;
 	temperature* temp;
-	int outMaxIter, inMaxIter;
+	//int outMaxIter, inMaxIter;
 	int bestCriterion, curCriterion;
  
 
 public:
-	mainAlgoritnhm(solution sol_, temperature temp_) : sol(sol_), temp(temp_) {}
+	mainAlgoritnhm(solution sol_, temperature temp_) : curSol(sol_), temp(temp_), curCriterion(crit_) {}
 	solution* mainCycle ()
 	{
-		while (outMaxIter--)
+		bestSol = curSol;
+		bestCriterion = curCriterion;
+		int inMaxIter, outMaxIter;
+		for (int i = 0; i < outMaxIter; i++)
 		{
 			while (inMaxIter--)
 			{
@@ -50,7 +64,7 @@ public:
 					}
 				} 
 			}
-			temp->decreaseTemp();
+			temp->decreaseTemp(i);
 		}
 		return bestSol;
 	}
