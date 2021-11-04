@@ -1,8 +1,33 @@
 #include <cmath>
+#include <vector>
+
+class oneJob
+{
+private:
+	double duration;
+
+public:
+	oneJob (dur_): duration(dur_){}
+
+	double getDuration ()
+	{
+		return duration;
+	}
+};
 
 class solution
 {
-
+	// вектор векторов
+private:
+	int procNum;
+	std::vector<std::vector<oneJob>> sol;
+public:
+	solution()
+	{
+		procNum = 0;
+		sol = std::vector<std::vector<oneJob>> (); 
+	}
+	
 };
 
 
@@ -17,6 +42,7 @@ public:
 	{
 		return curTemp;
 	}
+
 	void decreaseTemp(int iteration)
 	{
 		curTemp = initTemp / log (1 + iteration);
