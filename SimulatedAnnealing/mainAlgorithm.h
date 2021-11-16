@@ -5,29 +5,62 @@ class oneJob
 {
 private:
 	double duration;
-
+	std::vector<int> dependences;
+	int num;
+	
 public:
-	oneJob (dur_): duration(dur_){}
+	oneJob (double dur_, std::vector<int> dep_, int num_): duration(dur_), dependences(dep_), num(num_){}
 
 	double getDuration ()
 	{
 		return duration;
 	}
+
+	int getNum ()
+	{
+		return num;
+	}
 };
 
 class solution
 {
-	// вектор векторов
+
 private:
 	int procNum;
 	std::vector<std::vector<oneJob>> sol;
 public:
-	solution()
-	{
-		procNum = 0;
-		sol = std::vector<std::vector<oneJob>> (); 
-	}
+	solution(int procNum_, std::vector<std::vector<oneJob>> sol_): procNum(procNum_), sol(std::move(sol_)) {}
 	
+	~solution() = default;
+
+	double getCriterion()
+	{
+		double Tmax = 0.0, Tmin = -1.0, Tcur;
+		for (size_t i = 0; i < procNum; i++)
+		{
+			Tcur = 0.0;
+			for (auto j: sol[i])
+			{
+				Tcur += j.getDuration();
+			}
+			if (Tcur > Tmax)
+			{
+				Tmax = Tcur;
+			}
+			if (Tmin < 0.0 || Tcur < Tmin)
+			{
+				Tmin = Tcur;
+			}
+			
+		}
+		return Tmax - Tmin; 
+	}
+
+	solution * copyOfObj()
+	{
+		return new solution(*this);
+	}
+
 };
 
 
@@ -41,7 +74,7 @@ public:
 	temperature(double temp_ = 0) : initTemp(temp_), curTemp(temp_), iter(0) {}
 	
 	~temperature() = default;
-	
+
 	double getTemp ()
 	{
 		return curTemp;
@@ -57,6 +90,7 @@ public:
 };
 
 
+
 class mainAlgoritnhm
 {
 
@@ -65,7 +99,7 @@ private:
 	temperature* temp;
 	mutation* curMutation;
 	int globOutMaxIter = 100, globInMaxIter = 20;
-	int bestCriterion, curCriterion;
+	double bestCriterion, curCriterion;
  
 
 public:
@@ -85,12 +119,14 @@ public:
 	solution* mainCycle ()
 	{
 		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;
+		curCriterion = curSol->getCriterion();
+		bestCriterion = bestSol->getCriterion();
 		while (outMaxIter--)
 		{
 			while (inMaxIter--)
 			{
 				solution * newSol = curMutation->mutate(curSol->copyOfObj());
-				int newCriterion = newSol->getCriterion();
+				double newCriterion = newSol->getCriterion();
 				// сначала проверить, лучше ли лучшего
 				// потом сравниваем с текущем
 				if (newCriterion < bestCriterion)
