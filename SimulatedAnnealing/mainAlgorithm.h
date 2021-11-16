@@ -57,40 +57,60 @@ class mainAlgoritnhm
 private:
 	solution* curSol, bestSol;
 	temperature* temp;
-	//int outMaxIter, inMaxIter;
+	mutation* curMutation;
+	int globOutMaxIter = 100, globInMaxIter = 20;
 	int bestCriterion, curCriterion;
  
 
 public:
-	mainAlgoritnhm(solution sol_, temperature temp_) : curSol(sol_), temp(temp_), curCriterion(crit_) {}
+	mainAlgoritnhm(solution* initSol, double initTemp, mutation* initMutation): curMutation(initMutation){
+		curSol = initSol->copyOfObj();
+		best = initSol->copyOfObj();
+		temp = new temperature(initTemp);
+	} 
+	
+	~mainAlgoritnhm() {
+		delete(curSol);
+		delete(bestSol);
+		delete(temp);
+		delete(curMutation);
+	}
+
 	solution* mainCycle ()
 	{
-		bestSol = curSol;
-		bestCriterion = curCriterion;
-		int inMaxIter, outMaxIter;
-		for (int i = 0; i < outMaxIter; i++)
+		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;
+		while (outMaxIter--)
 		{
 			while (inMaxIter--)
 			{
-				solution newSol;
-				int newCriterion;
+				solution * newSol = curMutation->mutate(curSol->copyOfObj());
+				int newCriterion = newSol->getCriterion();
 				// сначала проверить, лучше ли лучшего
 				// потом сравниваем с текущем
-				if (curCriterion < criterion)
+				if (newCriterion < bestCriterion)
 				{
-					bestSol = newSol;
-					criterion = curCriterion;
-				} else {
-					double probOfChange;
-					double random;
-					if (random < probOfChange)
-					{
-						curSol = newSol;
-						curCriterion = newCriterion;
-					}
+					delete bestSol;
+					bestSol = newSol->copyOfObj();
+					bestCriterion = newCriterion;
+					outMaxIter = globOutMaxIter;
 				} 
+				int diff = newCriterion - curCriterion;
+				if (diff <= 0)
+				{
+					delete curSol;
+					curSol = newSol->copyOfObj();
+					curCriterion = newCriterion;					
+				} else {
+					double probOfChange = getRandom<double>(0.0, 1.0);
+					if (probOfChange < exp(-diff / temp->getTemp()))
+					{
+				 		delete curSol;
+				 		curSol = newSol->copyOfObj();
+				 		curCriterion = newCriterion;					
+					}	
+				}	 
 			}
-			temp->decreaseTemp(i);
+			temp->decreaseTemp();
 		}
 		return bestSol;
 	}
