@@ -4,21 +4,36 @@
 class oneJob
 {
 private:
-	double duration;
-	std::vector<int> dependences;
+	double duration, tStart = 0.0;
+	std::vector<oneJob *> dependences;
 	int num;
 	
 public:
-	oneJob (double dur_, std::vector<int> dep_, int num_): duration(dur_), dependences(dep_), num(num_){}
+	oneJob (double dur_, std::vector<oneJob*> dep_, int num_): duration(dur_), dependences(dep_), num(num_){}
 
 	double getDuration ()
 	{
 		return duration;
 	}
 
+	double getTStart ()
+	{
+		return tStart;
+	}
+
 	int getNum ()
 	{
 		return num;
+	}
+
+	double getLastTStart()
+	{
+		double time = 0.0;
+		for (auto i: dependences)
+		{
+			time = std::max(time, i->getTStart + i->getDuration);
+		}
+		return time;
 	}
 };
 
@@ -35,14 +50,10 @@ public:
 
 	double getCriterion()
 	{
-		double Tmax = 0.0, Tmin = -1.0, Tcur;
+		double Tmax = 0.0, Tmin = -1.0, Tcur, tLast = 0.0;
 		for (size_t i = 0; i < procNum; i++)
 		{
-			Tcur = 0.0;
-			for (auto j: sol[i])
-			{
-				Tcur += j.getDuration();
-			}
+			Tcur = ((sol[i])[sol[i].size() - 1]).getTStart() + ((sol[i])[sol[i].size() - 1]).getDuration();
 			if (Tcur > Tmax)
 			{
 				Tmax = Tcur;
@@ -61,6 +72,63 @@ public:
 		return new solution(*this);
 	}
 
+	int getProcNum()
+	{
+		return procNum;
+	}
+
+	size_t jobsNumOnProc(int numOfProc)
+	{
+		return sol[numOfProc].size();
+	}
+
+	std::vector<int> emptyTask(int procNum_, double duration, double tStart)
+	{
+		double lastTime = 0.0;
+		std::vector<int> forInsert = {};
+		for (size_t i = 0; i < sol[procNum_].size(); i++)
+		{
+			if (sol[procNum_][i].getTStart() > tStart)
+			{
+				if (sol[procNum_][i].getTStart() - tStart < duration)
+				{
+					forInsert.push_back(i);
+				}
+			}
+			lastTime = sol[procNum_][i].getTStart() + sol[procNum_][i].getDuration(); 
+		}
+		return forInsert;
+	}
+
+};
+
+class mutation
+{
+public:
+	mutation* copy() = 0;
+    ~mutation() = default;
+
+	solution* mutate(solution* sol)
+	{
+		size_t numOfProc = getRandom<int>(0, sol->getProcNum());
+		while (sol->jobsNumOnProc(numOfProc) == 0)
+		{
+			numOfProc = getRandom<int>(0, sol->getProcNum());
+		}
+		size_t numOfjob = getRandom<int>(0, sol->jobsNumOnProc);
+		double lastTStart = (sol[numOfProc])[numOfjob].getLastTStart(); 
+		size_t newNumOfProc = getRandom<int>(0, sol->getProcNum());
+		while (sol->jobsNumOnProc(newnumOfProc) == 0)
+		{
+			newnumOfProc = getRandom<int>(0, sol->getProcNum());
+		}
+
+		std::vector<int> forInsert = sol->emptyTask(newNumOfProc, sol[numOfProc][numOfjob].getDuration(), lastTStart);
+		size_t newNumOfjob = getRandom<int>(0, forInsert.size());
+		oneJob j = sol->eraseJob(numOfProc, numOfjob);
+		sol->insertJob(std::move(j), newNumOfProc, forInsert[newNumOfjob]);
+		return sol;
+	}
 };
 
 
