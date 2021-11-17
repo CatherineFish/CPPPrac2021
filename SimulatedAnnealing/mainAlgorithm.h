@@ -1,11 +1,21 @@
 #include <cmath>
 #include <vector>
+#include <map>
+#include <iostream>
+#include <cstdlib>
+
+template <typename T>
+T getRandom(T min, T max) {
+    static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
+    return static_cast<T>(rand() * fraction * (max - min) + min);
+}
+
 
 class oneJob
 {
 private:
 	double duration, tStart = 0.0;
-	std::vector<oneJob *> dependences;
+	std::vector<oneJob *> dependences ={};
 	int num;
 	
 public:
@@ -31,9 +41,15 @@ public:
 		double time = 0.0;
 		for (auto i: dependences)
 		{
-			time = std::max(time, i->getTStart + i->getDuration);
+			time = std::max(time, i->getTStart() + i->getDuration());
 		}
 		return time;
+	}
+
+	void setTStart(double time)
+	{
+		tStart = time;
+		return;
 	}
 };
 
@@ -42,9 +58,17 @@ class solution
 
 private:
 	int procNum;
-	std::vector<std::vector<oneJob>> sol;
+	std::vector<std::vector<oneJob *>> sol;
 public:
-	solution(int procNum_, std::vector<std::vector<oneJob>> sol_): procNum(procNum_), sol(std::move(sol_)) {}
+	solution(int procNum_, std::vector<std::vector<oneJob>> sol_): procNum(procNum_){
+		for (size_t i = 0; i < procNum; i++) {
+            sol.emplace_back(std::vector<oneJob *>());
+        	for (size_t j = 0; j < sol_[i].size(); j++) {
+            	sol[i].emplace_back(sol_[i][j]);
+        	}
+        }
+        
+	}
 	
 	~solution() = default;
 
@@ -53,7 +77,7 @@ public:
 		double Tmax = 0.0, Tmin = -1.0, Tcur, tLast = 0.0;
 		for (size_t i = 0; i < procNum; i++)
 		{
-			Tcur = ((sol[i])[sol[i].size() - 1]).getTStart() + ((sol[i])[sol[i].size() - 1]).getDuration();
+			Tcur = ((sol[i])[sol[i].size() - 1])->getTStart() + ((sol[i])[sol[i].size() - 1])->getDuration();
 			if (Tcur > Tmax)
 			{
 				Tmax = Tcur;
@@ -82,22 +106,95 @@ public:
 		return sol[numOfProc].size();
 	}
 
-	std::vector<int> emptyTask(int procNum_, double duration, double tStart)
+	size_t emptyTask(int procNum_, double duration, double tStart)
 	{
 		double lastTime = 0.0;
-		std::vector<int> forInsert = {};
+		size_t j = 0;
 		for (size_t i = 0; i < sol[procNum_].size(); i++)
 		{
-			if (sol[procNum_][i].getTStart() > tStart)
+			if (sol[procNum_][i]->getTStart() > tStart)
 			{
-				if (sol[procNum_][i].getTStart() - tStart < duration)
-				{
-					forInsert.push_back(i);
-				}
+				j = i;
+				break;
 			}
-			lastTime = sol[procNum_][i].getTStart() + sol[procNum_][i].getDuration(); 
 		}
-		return forInsert;
+		return getRandom<int>(j, sol[procNum_].size());
+	}
+
+	oneJob* eraseJob(size_t numOfProc, int numOfjob)
+	{
+		oneJob * j = sol[numOfProc][numOfjob];
+		sol[numOfProc].erase(sol[numOfProc].begin() + numOfjob);
+		return j;
+	}
+
+	void update(size_t numOfProc)
+	{
+		std::map<oneJob *, double> allJobs;
+		for (size_t i = 0; i < sol.size(); i++)
+		{
+			for (size_t j = 0; j < sol[i].size(); j++)
+			{
+				allJobs.insert({sol[i][j], sol[i][j]->getTStart()});
+			}
+		}
+		for(std::map<oneJob *, double>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
+			 it->first->setTStart(std::max(it->first->getLastTStart(), it->first->getTStart()));
+		}
+
+		double lastTime = 0;
+		for (size_t i = 0; i < sol.size(); i++)
+		{
+			if (i == numOfProc) continue;
+			for (size_t j = 0; j < sol[i].size(); j++)
+			{
+				sol[i][j]->setTStart(std::max(sol[i][j]->getLastTStart(), std::max(sol[i][j]->getTStart(), lastTime)));
+				lastTime = sol[i][j]->getTStart() + sol[i][j]->getDuration();
+			}
+		}
+		return;
+	}
+
+	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob, double lastTStart)
+	{
+		sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);
+		j->setTStart(std::max(sol[numOfProc][numOfjob - 1]->getTStart() + sol[numOfProc][numOfjob - 1]->getDuration(), lastTStart));
+		double last = j->getTStart() + j->getDuration();
+		for (size_t i = numOfjob + 1; i < sol[numOfProc].size(); i++)
+		{
+			if (last < sol[numOfProc][i]->getTStart())
+			{
+				break;
+			} else {
+				sol[numOfProc][i]->setTStart(last);
+				last = last + sol[numOfProc][i]->getDuration();	
+			}
+		}
+		this->update(numOfProc);
+		return;
+	}
+
+	double getLastTStart(size_t numOfProc, size_t numOfjob)
+	{
+		return sol[numOfProc][numOfjob]->getLastTStart();
+	}
+
+	double getDuration(size_t numOfProc, size_t numOfjob)
+	{
+		return sol[numOfProc][numOfjob]->getDuration();
+	}
+
+	void print()
+	{
+		for (size_t i = 0; i < sol.size(); i++)
+		{
+			std::cout << "Processor #" << i << ": ";
+			for (size_t j = 0; j < sol[i].size(); j++)
+			{
+				std::cout << "( t_start = " << sol[i][j]->getTStart() << " dur = " << sol[i][j]->getDuration() << " ), ";
+			}
+			std::cout << std::endl; 
+		}
 	}
 
 };
@@ -105,8 +202,7 @@ public:
 class mutation
 {
 public:
-	mutation* copy() = 0;
-    ~mutation() = default;
+	~mutation() = default;
 
 	solution* mutate(solution* sol)
 	{
@@ -115,18 +211,17 @@ public:
 		{
 			numOfProc = getRandom<int>(0, sol->getProcNum());
 		}
-		size_t numOfjob = getRandom<int>(0, sol->jobsNumOnProc);
-		double lastTStart = (sol[numOfProc])[numOfjob].getLastTStart(); 
+		size_t numOfjob = getRandom<int>(0, sol->jobsNumOnProc(numOfProc));
+		double lastTStart = sol->getLastTStart(numOfProc, numOfjob); 
 		size_t newNumOfProc = getRandom<int>(0, sol->getProcNum());
-		while (sol->jobsNumOnProc(newnumOfProc) == 0)
+		while (sol->jobsNumOnProc(newNumOfProc) == 0)
 		{
-			newnumOfProc = getRandom<int>(0, sol->getProcNum());
+			newNumOfProc = getRandom<int>(0, sol->getProcNum());
 		}
 
-		std::vector<int> forInsert = sol->emptyTask(newNumOfProc, sol[numOfProc][numOfjob].getDuration(), lastTStart);
-		size_t newNumOfjob = getRandom<int>(0, forInsert.size());
-		oneJob j = sol->eraseJob(numOfProc, numOfjob);
-		sol->insertJob(std::move(j), newNumOfProc, forInsert[newNumOfjob]);
+		size_t newNumOfjob = sol->emptyTask(newNumOfProc, sol->getDuration(numOfProc, numOfjob), lastTStart);		
+		oneJob* j = sol->eraseJob(numOfProc, numOfjob);
+		sol->insertJob(std::move(j), newNumOfProc, newNumOfjob, lastTStart);
 		return sol;
 	}
 };
@@ -149,7 +244,7 @@ public:
 	}
 
 
-	void decreaseTemp(int iteration)
+	void decreaseTemp()
 	{
 		iter++;
 		curTemp = initTemp / log (1 + iter);
@@ -163,7 +258,7 @@ class mainAlgoritnhm
 {
 
 private:
-	solution* curSol, bestSol;
+	solution* curSol, *bestSol;
 	temperature* temp;
 	mutation* curMutation;
 	int globOutMaxIter = 100, globInMaxIter = 20;
@@ -173,7 +268,7 @@ private:
 public:
 	mainAlgoritnhm(solution* initSol, double initTemp, mutation* initMutation): curMutation(initMutation){
 		curSol = initSol->copyOfObj();
-		best = initSol->copyOfObj();
+		bestSol = initSol->copyOfObj();
 		temp = new temperature(initTemp);
 	} 
 	
