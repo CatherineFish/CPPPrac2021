@@ -1,3 +1,6 @@
+#pragma once
+#include "solution.h"
+
 class mutation
 {
 public:
@@ -11,15 +14,14 @@ public:
 			numOfProc = getRandom<int>(0, sol->getProcNum());
 		}
 		size_t numOfjob = getRandom<int>(0, sol->jobsNumOnProc(numOfProc));
+		std::cout << "numOfProc = " << numOfProc << " numOfjob = " << numOfjob << std::endl;
 		double lastTStart = sol->getLastTStart(numOfProc, numOfjob); 
 		size_t newNumOfProc = getRandom<int>(0, sol->getProcNum());
-		while (sol->jobsNumOnProc(newNumOfProc) == 0)
-		{
-			newNumOfProc = getRandom<int>(0, sol->getProcNum());
-		}
-
-		size_t newNumOfjob = sol->emptyTask(newNumOfProc, sol->getDuration(numOfProc, numOfjob), lastTStart);		
+		
 		oneJob* j = sol->eraseJob(numOfProc, numOfjob);
+		size_t newNumOfjob = sol->emptyTask(newNumOfProc, sol->getDuration(numOfProc, numOfjob), lastTStart, j);		
+		std::cout << "NEWnumOfProc = " << newNumOfProc << " NEWNumOfjob = " << newNumOfjob<< " lastTStart = " << lastTStart << std::endl;
+		
 		sol->insertJob(std::move(j), newNumOfProc, newNumOfjob, lastTStart);
 		return sol;
 	}

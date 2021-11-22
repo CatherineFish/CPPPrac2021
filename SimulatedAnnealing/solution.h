@@ -1,3 +1,4 @@
+#pragma once
 #include <cmath>
 #include <vector>
 #include <map>
@@ -8,11 +9,23 @@ class oneJob
 {
 private:
 	double duration, tStart = 0.0;
-	std::vector<oneJob *> dependences ={};
-	int num;
 	
 public:
-	oneJob (double dur_, std::vector<oneJob*> dep_, int num_): duration(dur_), dependences(dep_), num(num_){}
+	std::vector<oneJob *> dependences = {};
+	oneJob(double dur) 
+	{
+		duration = dur;
+		
+	}
+
+	void initializeJob(std::vector<oneJob *> dep)
+	{
+		for (size_t i = 0; i < dep.size(); i++)
+		{
+			dependences.push_back(dep[i]);
+		}
+		return;
+	}
 
 	double getDuration ()
 	{
@@ -24,11 +37,7 @@ public:
 		return tStart;
 	}
 
-	int getNum ()
-	{
-		return num;
-	}
-
+	
 	double getLastTStart()
 	{
 		double time = 0.0;
@@ -46,6 +55,8 @@ public:
 	}
 };
 
+
+
 class solution
 {
 
@@ -53,7 +64,7 @@ private:
 	int procNum;
 	std::vector<std::vector<oneJob *>> sol;
 public:
-	solution(int procNum_, std::vector<std::vector<oneJob>> sol_): procNum(procNum_){
+	solution(int procNum_, std::vector<std::vector<oneJob *>> sol_): procNum(procNum_){
 		for (size_t i = 0; i < procNum; i++) {
             sol.emplace_back(std::vector<oneJob *>());
         	for (size_t j = 0; j < sol_[i].size(); j++) {
@@ -70,16 +81,22 @@ public:
 		double Tmax = 0.0, Tmin = -1.0, Tcur, tLast = 0.0;
 		for (size_t i = 0; i < procNum; i++)
 		{
-			Tcur = ((sol[i])[sol[i].size() - 1])->getTStart() + ((sol[i])[sol[i].size() - 1])->getDuration();
-			if (Tcur > Tmax)
-			{
-				Tmax = Tcur;
-			}
-			if (Tmin < 0.0 || Tcur < Tmin)
-			{
-				Tmin = Tcur;
+			if (sol[i].size()) {
+				Tcur = sol[i][sol[i].size() - 1]->getTStart() + sol[i][sol[i].size() - 1]->getDuration();
+				if (Tcur > Tmax)
+				{
+					Tmax = Tcur;
+				}
+				else if (Tmin < 0.0 || Tcur < Tmin)
+				{
+					Tmin = Tcur;
+				}
 			}
 			
+		}
+		if (Tmin < 0.0)
+		{
+			Tmin = 0.0;
 		}
 		return Tmax - Tmin; 
 	}
@@ -99,25 +116,44 @@ public:
 		return sol[numOfProc].size();
 	}
 
-	size_t emptyTask(int procNum_, double duration, double tStart)
+	size_t emptyTask(int procNum_, double duration, double tStart, oneJob *curJob)
 	{
+		
 		double lastTime = 0.0;
-		size_t j = 0;
+		size_t j = 0, k = std::min(size_t(0), sol[procNum_].size() - 1);
 		for (size_t i = 0; i < sol[procNum_].size(); i++)
 		{
-			if (sol[procNum_][i]->getTStart() > tStart)
+			if (!j && sol[procNum_][i]->getTStart() > tStart)
 			{
 				j = i;
-				break;
+			}
+			if (j) {
+				std::cout << "CHECK " << sol[procNum_][i]->getDuration() << "dep = " << sol[procNum_][i]->dependences.size() << std::endl;
+				for (auto job: sol[procNum_][i]->dependences)
+				{
+					std::cout << "dur = " << job->getDuration() << std::endl;
+					if (job == curJob) {
+						std::cout << "YES" << std::endl;
+						k = i;
+						break;
+					}
+				}
+				if (k != sol[procNum_].size() - 1)
+				{
+					break;
+				}
 			}
 		}
-		return getRandom<int>(j, sol[procNum_].size());
+		std::cout << "j = " << j << " k = " << k << std::endl;
+		return getRandom<int>(j, k);
 	}
 
 	oneJob* eraseJob(size_t numOfProc, int numOfjob)
 	{
 		oneJob * j = sol[numOfProc][numOfjob];
 		sol[numOfProc].erase(sol[numOfProc].begin() + numOfjob);
+		std::cout << "AFTER ERASE: " << std::endl;
+		this->print();
 		return j;
 	}
 
@@ -151,18 +187,17 @@ public:
 	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob, double lastTStart)
 	{
 		sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);
-		j->setTStart(std::max(sol[numOfProc][numOfjob - 1]->getTStart() + sol[numOfProc][numOfjob - 1]->getDuration(), lastTStart));
-		double last = j->getTStart() + j->getDuration();
-		for (size_t i = numOfjob + 1; i < sol[numOfProc].size(); i++)
+		std::cout << "AFTER INSERT" << std::endl;
+		//j->setTStart(std::max(sol[numOfProc][numOfjob - 1]->getTStart() + sol[numOfProc][numOfjob - 1]->getDuration(), lastTStart));
+		std::cout << "PROC NUM: " << numOfProc << std::endl;
+		double last = 0;
+		for (size_t i = 0; i < sol[numOfProc].size(); i++)
 		{
-			if (last < sol[numOfProc][i]->getTStart())
-			{
-				break;
-			} else {
-				sol[numOfProc][i]->setTStart(last);
-				last = last + sol[numOfProc][i]->getDuration();	
-			}
+			std::cout << i << " last = " << last << " lastTstart = " << sol[numOfProc][i]->getLastTStart() << std::endl;
+			sol[numOfProc][i]->setTStart(std::max(last, sol[numOfProc][i]->getLastTStart()));
+			last = sol[numOfProc][i]->getTStart() + sol[numOfProc][i]->getDuration();	
 		}
+		this->print();
 		this->update(numOfProc);
 		return;
 	}
