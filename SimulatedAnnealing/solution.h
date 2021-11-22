@@ -61,10 +61,10 @@ class solution
 {
 
 private:
-	int procNum;
+	size_t procNum;
 	std::vector<std::vector<oneJob *>> sol;
 public:
-	solution(int procNum_, std::vector<std::vector<oneJob *>> sol_): procNum(procNum_){
+	solution(size_t procNum_, std::vector<std::vector<oneJob *>> sol_): procNum(procNum_){
 		for (size_t i = 0; i < procNum; i++) {
             sol.emplace_back(std::vector<oneJob *>());
         	for (size_t j = 0; j < sol_[i].size(); j++) {
@@ -116,7 +116,7 @@ public:
 		return sol[numOfProc].size();
 	}
 
-	size_t emptyTask(int procNum_, double duration, double tStart, oneJob *curJob)
+	size_t emptyTask(int procNum_, double tStart, oneJob *curJob)
 	{
 		
 		double lastTime = 0.0;
@@ -184,7 +184,7 @@ public:
 		return;
 	}
 
-	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob, double lastTStart)
+	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob)
 	{
 		sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);
 		std::cout << "AFTER INSERT" << std::endl;

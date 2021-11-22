@@ -19,10 +19,10 @@ public:
 		size_t newNumOfProc = getRandom<int>(0, sol->getProcNum());
 		
 		oneJob* j = sol->eraseJob(numOfProc, numOfjob);
-		size_t newNumOfjob = sol->emptyTask(newNumOfProc, sol->getDuration(numOfProc, numOfjob), lastTStart, j);		
+		size_t newNumOfjob = sol->emptyTask(newNumOfProc, lastTStart, j);		
 		std::cout << "NEWnumOfProc = " << newNumOfProc << " NEWNumOfjob = " << newNumOfjob<< " lastTStart = " << lastTStart << std::endl;
 		
-		sol->insertJob(std::move(j), newNumOfProc, newNumOfjob, lastTStart);
+		sol->insertJob(std::move(j), newNumOfProc, newNumOfjob);
 		return sol;
 	}
 };

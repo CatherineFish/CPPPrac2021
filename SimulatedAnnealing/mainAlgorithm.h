@@ -16,7 +16,7 @@ private:
 	solution* curSol, *bestSol;
 	temperature* temp;
 	mutation* curMutation;
-	int globOutMaxIter = 1, globInMaxIter = 1;
+	int globOutMaxIter = 10, globInMaxIter = 10;
 	double bestCriterion, curCriterion;
  
 
