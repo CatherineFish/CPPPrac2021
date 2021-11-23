@@ -204,7 +204,7 @@ public:
 	{
 		
 		for(std::multimap<double, oneJob *>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
-			//std::cout << "DUR = " << it->second->getDuration() << " LastTime = " << it->second->getLastTStart() << " StartTime = " << it->second->getTStart() << std::endl;
+			std::cout << "DUR = " << it->second->getDuration() << " StartTime = " << it->second->getTStart() << std::endl;
 			it->second->setTStart(it->second->getLastTStart());
 		}
 
@@ -215,6 +215,7 @@ public:
 			lastTime = 0;
 			for (size_t j = 0; j < sol[i].size(); j++)
 			{
+				//std::cout << "DUR: " << sol[i][j]->getDuration()
 				sol[i][j]->setTStart(std::max(sol[i][j]->getTStart(), lastTime));
 				lastTime = sol[i][j]->getTStart() + sol[i][j]->getDuration();
 			}
@@ -222,10 +223,18 @@ public:
 		return;
 	}
 
-	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob)
+	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob, bool flag)
 	{
+		if (!flag) {
+			if (numOfjob == sol[numOfProc].size()) {
+				sol[numOfProc].push_back(j);	
+			} else {
+				sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);	
+			}
+			return;
+		}
 		std::multimap<double, oneJob *> allJobs;
-		//std::cout << "ALL JOBS" << std::endl;
+		std::cout << "ALL JOBS" << std::endl;
 		
 		for (size_t i = 0; i < sol.size(); i++)
 		{
