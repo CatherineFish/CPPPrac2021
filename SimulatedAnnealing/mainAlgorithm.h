@@ -36,7 +36,7 @@ public:
 
 	solution* mainCycle ()
 	{
-		std::cout << "MAIN CYCLE\n";
+		//std::cout << "MAIN CYCLE\n";
 		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;
 		curCriterion = curSol->getCriterion();
 		bestCriterion = bestSol->getCriterion();
