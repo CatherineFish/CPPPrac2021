@@ -21,7 +21,6 @@ public:
 		oneJob* j = sol->eraseJob(numOfProc, numOfjob);
 		size_t newNumOfjob = sol->emptyTask(newNumOfProc, lastTStart, j);		
 		std::cout << "NEWnumOfProc = " << newNumOfProc << " NEWNumOfjob = " << newNumOfjob<< " lastTStart = " << lastTStart << std::endl;
-		
 		sol->insertJob(std::move(j), newNumOfProc, newNumOfjob);
 		return sol;
 	}

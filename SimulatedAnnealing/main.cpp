@@ -13,12 +13,11 @@ int main()
 {
 		
 	oneJob *j_0, *j_1, *j_2, *j_3, *j_4;
-	j_0 = new oneJob(100.0);
-	j_1 = new oneJob(50.0);
-	j_2 = new oneJob(12.0);
-	j_3 = new oneJob(8888.0);
-	j_4 = new oneJob(70000.0);
-		
+	j_0 = new oneJob(100.0, 0, {});
+	j_1 = new oneJob(50.0, 1, {0, 2});
+	j_2 = new oneJob(12.0, 2, {0});
+	j_3 = new oneJob(8888.0, 3, {4});
+	j_4 = new oneJob(70000.0, 4, {});
 	
 	j_0->initializeJob({});
 	j_1->initializeJob({j_0, j_2});

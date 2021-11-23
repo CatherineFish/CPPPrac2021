@@ -9,13 +9,15 @@ class oneJob
 {
 private:
 	double duration, tStart = 0.0;
-	
+	size_t num;
 public:
 	std::vector<oneJob *> dependences = {};
-	oneJob(double dur) 
+	std::vector<size_t> depNum;
+	oneJob(double dur, size_t num_, std::vector<size_t> depNum_): duration(dur), num(num_) 
 	{
-		duration = dur;
-		
+		for (auto i: depNum_){
+			depNum.push_back(i);
+		}
 	}
 
 	void initializeJob(std::vector<oneJob *> dep)
@@ -36,13 +38,19 @@ public:
 	{
 		return tStart;
 	}
-
+	size_t getNum ()
+	{
+		return num;
+	}
 	
 	double getLastTStart()
 	{
+		std::cout << "DUR: " << this->getDuration() << "DEP SIZE: " << dependences.size() << std::endl;
 		double time = 0.0;
+		std::cout << "DEP" << std::endl;
 		for (auto i: dependences)
 		{
+			std::cout << "DURATION: " << i->getDuration() << " START" << i->getTStart() << std::endl;
 			time = std::max(time, i->getTStart() + i->getDuration());
 		}
 		return time;
@@ -53,6 +61,7 @@ public:
 		tStart = time;
 		return;
 	}
+
 };
 
 
@@ -103,7 +112,36 @@ public:
 
 	solution * copyOfObj()
 	{
-		return new solution(*this);
+		std::vector<std::vector<oneJob *>> newSol;
+		std::map<size_t, oneJob*> allJobs;
+
+		for (size_t i = 0; i < procNum; i++) {
+        	for (size_t j = 0; j < sol[i].size(); j++) {
+        		allJobs.insert({sol[i][j]->getNum(), new oneJob(sol[i][j]->getDuration(), sol[i][j]->getNum(), sol[i][j]->depNum)});
+        		allJobs[sol[i][j]->getNum()]->setTStart(sol[i][j]->getTStart());
+        		//std::cout << "MAP " << allJobs[sol[i][j]->getNum()]->depNum.size() << std::endl;
+        	}
+        }
+
+        for(std::map<size_t, oneJob *>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
+			//std::cout<<"======== NUM OF JOB = " << it->first <<" =========" << std::endl;
+			//std::cout << "DEP SIZE = " << it->second->depNum.size() << std::endl;
+			std::vector<oneJob*> curDep;
+			for (auto k: it->second->depNum)
+			{
+				curDep.push_back(allJobs[k]);
+			}
+			//std::cout << "RESULT SIZE: " << curDep.size() << std::endl;
+			it->second->initializeJob(curDep);
+		}
+		for(size_t ii = 0; ii < sol.size(); ii++){
+			newSol.push_back(std::vector<oneJob*>());
+			for (size_t jj = 0; jj < sol[ii].size(); jj++){
+				newSol[ii].push_back(allJobs[sol[ii][jj]->getNum()]);
+			}
+		}
+
+		return new solution(procNum, newSol);
 	}
 
 	int getProcNum()
@@ -120,14 +158,14 @@ public:
 	{
 		
 		double lastTime = 0.0;
-		size_t j = 0, k = std::min(size_t(0), sol[procNum_].size() - 1);
+		size_t j = -1, k = std::min(size_t(0), sol[procNum_].size() - 1);
 		for (size_t i = 0; i < sol[procNum_].size(); i++)
 		{
 			if (!j && sol[procNum_][i]->getTStart() > tStart)
 			{
 				j = i;
 			}
-			if (j) {
+			if (j != -1) {
 				std::cout << "CHECK " << sol[procNum_][i]->getDuration() << "dep = " << sol[procNum_][i]->dependences.size() << std::endl;
 				for (auto job: sol[procNum_][i]->dependences)
 				{
@@ -144,6 +182,9 @@ public:
 				}
 			}
 		}
+		if (j == -1) {
+			return sol[procNum_].size();
+		}
 		std::cout << "j = " << j << " k = " << k << std::endl;
 		return getRandom<int>(j, k);
 	}
@@ -152,32 +193,36 @@ public:
 	{
 		oneJob * j = sol[numOfProc][numOfjob];
 		sol[numOfProc].erase(sol[numOfProc].begin() + numOfjob);
-		std::cout << "AFTER ERASE: " << std::endl;
-		this->print();
 		return j;
 	}
 
 	void update(size_t numOfProc)
 	{
-		std::map<oneJob *, double> allJobs;
+		std::multimap<double, oneJob *> allJobs;
+		std::cout << "ALL JOBS" << std::endl;
+		
 		for (size_t i = 0; i < sol.size(); i++)
 		{
+			std::cout << "PROC: " << i << std::endl;
 			for (size_t j = 0; j < sol[i].size(); j++)
 			{
-				allJobs.insert({sol[i][j], sol[i][j]->getTStart()});
+				std::cout << "JOB: " << sol[i][j]->getDuration() << std::endl; 
+				allJobs.insert({sol[i][j]->getTStart(), sol[i][j]});
 			}
 		}
-		for(std::map<oneJob *, double>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
-			 it->first->setTStart(std::max(it->first->getLastTStart(), it->first->getTStart()));
+		for(std::multimap<double, oneJob *>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
+			//std::cout << "DUR = " << it->second->getDuration() << " LastTime = " << it->second->getLastTStart() << " StartTime = " << it->second->getTStart() << std::endl;
+			it->second->setTStart(it->second->getLastTStart());
 		}
 
 		double lastTime = 0;
 		for (size_t i = 0; i < sol.size(); i++)
 		{
-			if (i == numOfProc) continue;
+			//if (i == numOfProc) continue;
+			lastTime = 0;
 			for (size_t j = 0; j < sol[i].size(); j++)
 			{
-				sol[i][j]->setTStart(std::max(sol[i][j]->getLastTStart(), std::max(sol[i][j]->getTStart(), lastTime)));
+				sol[i][j]->setTStart(std::max(sol[i][j]->getTStart(), lastTime));
 				lastTime = sol[i][j]->getTStart() + sol[i][j]->getDuration();
 			}
 		}
@@ -186,18 +231,17 @@ public:
 
 	void insertJob(oneJob* j, size_t numOfProc, size_t numOfjob)
 	{
-		sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);
-		std::cout << "AFTER INSERT" << std::endl;
-		//j->setTStart(std::max(sol[numOfProc][numOfjob - 1]->getTStart() + sol[numOfProc][numOfjob - 1]->getDuration(), lastTStart));
-		std::cout << "PROC NUM: " << numOfProc << std::endl;
+		if (numOfjob == sol[numOfProc].size()) {
+			sol[numOfProc].push_back(j);	
+		} else {
+			sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);	
+		}
 		double last = 0;
 		for (size_t i = 0; i < sol[numOfProc].size(); i++)
 		{
-			std::cout << i << " last = " << last << " lastTstart = " << sol[numOfProc][i]->getLastTStart() << std::endl;
 			sol[numOfProc][i]->setTStart(std::max(last, sol[numOfProc][i]->getLastTStart()));
 			last = sol[numOfProc][i]->getTStart() + sol[numOfProc][i]->getDuration();	
 		}
-		this->print();
 		this->update(numOfProc);
 		return;
 	}
