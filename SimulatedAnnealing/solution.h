@@ -100,6 +100,8 @@ public:
 				{
 					Tmin = Tcur;
 				}
+			} else {
+				Tmin = 0.0;
 			}
 			
 		}
