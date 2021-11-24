@@ -95,7 +95,7 @@ void degreeInitialize (int vertexDegree, int dispDegree)
 		}
 		std::cout << "COMP " << j << " ELEM: " << k << " last " << last << " cur " << cur << std::endl;
 		for (size_t i = last; i < cur; i++) {
-			int depVertNum = distForDegree(vertexDegree, dispDegree, allJobs[i].second.second);
+			int depVertNum = distForDegree(vertexDegree, dispDegree, std::max(1, allJobs[i].second.second));
 			std::cout << "         VERT: " << i << " Degree: " << depVertNum << " DEP: " << allJobs[i].second.second << std::endl;
 			allJobs[i].first->depNum = std::vector<size_t>();
 			depVertNum -= allJobs[i].second.second;
@@ -114,14 +114,52 @@ void degreeInitialize (int vertexDegree, int dispDegree)
 	return;
 }
 
+std::vector<oneJob *> transform () {
+	std::vector<oneJob *> res;
+	int curComp = 0, from = 0;
+	for (size_t i = 0; i < allJobs.size(); i++) {
+		if (curComp != allJobs[i].second.first) {
+			curComp = allJobs[i].second.first;
+			from = i;
+		}
+		res.push_back(new oneJob(allJobs[i].first->getDuration(), allJobs[i].first->getNum()));
+		for (size_t j = from; j < i; j++) {
+			for (auto dep: allJobs[j].first->depNum) {
+				if (dep == res[i]->getNum()) {
+					res[i]->depNum.push_back(j);
+				}
+			}
+		}
+
+	}
+	std::cout << "\n********************************************\n" << std::endl;
+	for (size_t i = 0; i < res.size(); i++) {
+		std::cout << "Num: " << res[i]->getNum() << " Weight: " << res[i]->getDuration();
+		std::cout << " Dependences: ";
+		if (res[i]->depNum.size()) {
+			for (auto j: res[i]->depNum) {
+				std::cout << j << " ";
+			}
+		}
+		std::cout << std::endl;
+
+	}
+
+
+	return res;
+}
+
+
+
 void inputFormat (std::string filename) {
+	std::vector<oneJob*> myAllJobs = transform();
 	std::ofstream file;
   	file.open(filename + ".txt");
-  	file << allJobs.size() << std::endl;
+  	file << myAllJobs.size() << std::endl;
   	
-  	for (auto job : allJobs) {
-  		file << job.first->getDuration();
-  		for (auto j: job.first->depNum) {
+  	for (auto job : myAllJobs) {
+  		file << job->getDuration();
+  		for (auto j: job->depNum) {
   			file << " " << j;
   		}
   		file << std::endl;

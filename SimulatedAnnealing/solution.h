@@ -14,7 +14,8 @@ public:
 	std::vector<oneJob *> dependences = {};
 	std::vector<size_t> depNum;
 
-	oneJob(double dur, size_t num_): duration(dur), num(num_) {}
+	oneJob(double dur, size_t num_): duration(dur), num(num_) 
+	{}
 
 	oneJob(double dur, size_t num_, std::vector<size_t> depNum_): duration(dur), num(num_) 
 	{

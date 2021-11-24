@@ -48,13 +48,13 @@ int compare (oneJob* arg1, oneJob * arg2)
 {
     for (auto dep_1: arg1->depNum) {
         if (dep_1 == arg2->getNum()) {
-            return 0;
+            return 1;
         }
     }
 
     for (auto dep_2: arg2->depNum) {
         if (dep_2 == arg1->getNum()) {
-            return 1;
+            return 0;
         }
     }
     return 0;
@@ -130,11 +130,10 @@ solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
         std::cout << std::endl;
     }
     std::cout << "\n============================\n" << std::endl;
-
+    
     for (size_t i = 0; i < jobsGroups.size(); i++) {
         bubbleSort(i);
     }
-
 
 
     for (size_t i = 0; i < jobsGroups.size(); i++) {
@@ -145,7 +144,6 @@ solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
         std::cout << std::endl;
     }
     std::cout << "\n============================\n" << std::endl;
-    
     for(auto job: allJobs) {
         std::vector<oneJob*> curDep;
         for (auto k: job->depNum)
@@ -175,7 +173,11 @@ solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
     for (size_t i = 0; i < initSol.size(); i++) {
         std::cout << "GROUP: " << i << std::endl;
         for (size_t j = 0; j < initSol[i].size(); j++) {
-            std::cout << initSol[i][j]->getNum() << " ";
+            std::cout << initSol[i][j]->getNum() << " : ";
+            for (auto dep: initSol[i][j]->dependences) {
+                std::cout << dep->getDuration() << " ";
+            }
+            std::cout << std::endl;
         }        
         std::cout << std::endl;
     }
@@ -236,12 +238,12 @@ int main()
     solution * sol = initSol(allJobs, procNum);
     std::cout << "\n============================\n" << std::endl;
     
-    sol->print();
+    //sol->print();
     //sol = new solution(3, initSol);
     mutation * mut;
     mut = new mutation();
     mainAlgorithm alg(sol, 1000, mut);
-    sol->print();
+    //sol->print();
     solution *res = alg.mainCycle();
     std::cout << "RESULT" << std::endl;
     res->print();
