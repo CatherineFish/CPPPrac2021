@@ -139,9 +139,9 @@ void dotFormat (std::string filename) {
   	file << "    ranksep = 1.5" << std::endl;
   	file << "    nodesep = .25" << std::endl;
   	for (auto job : allJobs) {
-  		file << "    " << job.first->getDuration() << " -> { ";
+  		file << "    " << job.first->getNum() << " -> { ";
   		for (auto j: job.first->depNum) {
-  			file << allJobs[j].first->getDuration() << " ";
+  			file << allJobs[j].first->getNum() << " ";
   		}
   		file << "};" << std::endl;
   		
