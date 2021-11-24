@@ -1,8 +1,8 @@
 CXX = g++
 CXXFLAGS += -std=c++17 -Wall -pedantic -Wextra -Wno-unused-variable
-SOURCES = main.cpp generator.cpp
+SOURCES =  generator.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = main generator
+EXECUTABLE =  generator
 
 all: $(SOURCES) $(EXECUTABLE)
 
