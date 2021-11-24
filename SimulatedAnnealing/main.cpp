@@ -194,7 +194,7 @@ solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
     return new solution(procNum, initSol);
 }
 
-int main()
+int main(int argc, char * argv[])
 {
         
     /*oneJob *j_0, *j_1, *j_2, *j_3, *j_4;
@@ -226,6 +226,11 @@ int main()
         first[i]->setTStart(time);
         time += first[i]->getDuration();
     }*/
+    if (argc < 2){
+        std::cout <<"Incorrect arguments" << std::endl;
+        return 0;
+    }
+    int stepsForPrint = std::atoi(argv[1]);
     int procNum = 3;
     std::vector<oneJob *> allJobs = parser("in.txt");
     for (size_t i = 0; i < allJobs.size(); i++) {
@@ -242,9 +247,10 @@ int main()
     //sol = new solution(3, initSol);
     mutation * mut;
     mut = new mutation();
-    mainAlgorithm alg(sol, 1000, mut);
+    mainAlgorithm alg(sol, 1000, mut, stepsForPrint);
     //sol->print();
     solution *res = alg.mainCycle();
     std::cout << "RESULT" << std::endl;
     res->print();
+    res->printNum();
 }

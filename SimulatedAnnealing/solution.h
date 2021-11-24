@@ -76,7 +76,9 @@ class solution
 private:
 	size_t procNum;
 	std::vector<std::vector<oneJob *>> sol;
+
 public:
+
 	solution(size_t procNum_, std::vector<std::vector<oneJob *>> sol_): procNum(procNum_){
 		for (size_t i = 0; i < procNum; i++) {
             sol.emplace_back(std::vector<oneJob *>());
@@ -287,4 +289,32 @@ public:
 		}
 	}
 
+	void printNum()
+	{
+		for (size_t i = 0; i < sol.size(); i++)
+		{
+			std::cout << "Processor #" << i << ": ";
+			for (size_t j = 0; j < sol[i].size(); j++)
+			{
+				std::cout << sol[i][j]->getNum() << " ";
+			}
+			std::cout << std::endl; 
+		}
+	}
+
+	void printNumFile(std::string filename)
+	{
+		std::ofstream file(filename, std::ios::app);
+  		
+		file << sol.size() << std::endl;
+		for (size_t i = 0; i < sol.size(); i++)
+		{
+			file << i << ": ";
+			for (size_t j = 0; j < sol[i].size(); j++)
+			{
+				file << sol[i][j]->getNum() << " ";
+			}
+			file << std::endl; 
+		}
+	}
 };
