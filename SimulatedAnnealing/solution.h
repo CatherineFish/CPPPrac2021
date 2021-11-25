@@ -8,16 +8,17 @@
 class oneJob
 {
 private:
-	double duration, tStart = 0.0;
+	int duration, tStart = 0;
 	size_t num;
 public:
 	std::vector<oneJob *> dependences = {};
 	std::vector<size_t> depNum;
 	int proc;
-	oneJob(double dur, size_t num_): duration(dur), num(num_) 
+	
+	oneJob(int dur, size_t num_): duration(dur), num(num_) 
 	{}
 
-	oneJob(double dur, size_t num_, std::vector<size_t> depNum_): duration(dur), num(num_) 
+	oneJob(int dur, size_t num_, std::vector<size_t> depNum_): duration(dur), num(num_) 
 	{
 		for (auto i: depNum_){
 			depNum.push_back(i);
@@ -33,24 +34,25 @@ public:
 		return;
 	}
 
-	double getDuration ()
+	int getDuration ()
 	{
 		return duration;
 	}
 
-	double getTStart ()
+	int getTStart ()
 	{
 		return tStart;
 	}
+	
 	size_t getNum ()
 	{
 		return num;
 	}
 	
-	double getLastTStart()
+	int getLastTStart()
 	{
 		//std::cout << "DUR: " << this->getDuration() << "DEP SIZE: " << dependences.size() << std::endl;
-		double time = 0.0;
+		int time = 0;
 		//std::cout << "DEP" << std::endl;
 		for (auto i: dependences)
 		{
@@ -93,7 +95,7 @@ public:
 
 	double getCriterion()
 	{
-		double Tmax = 0.0, Tmin = -1.0, Tcur, tLast = 0.0;
+		int Tmax = 0, Tmin = -1, Tcur, tLast = 0;
 		for (size_t i = 0; i < procNum; i++)
 		{
 			if (sol[i].size()) {
@@ -102,25 +104,25 @@ public:
 				{
 					Tmax = Tcur;
 				}
-				else if (Tmin < 0.0 || Tcur < Tmin)
+				else if (Tmin < 0 || Tcur < Tmin)
 				{
 					Tmin = Tcur;
 				}
 			} else {
-				Tmin = 0.0;
+				Tmin = 0;
 			}
 			
 		}
-		if (Tmin < 0.0)
+		if (Tmin < 0)
 		{
-			Tmin = 0.0;
+			Tmin = 0;
 		}
 		return Tmax - Tmin; 
 	}
 
-	double duration()
+	int duration()
 	{
-		double Tmax = 0.0, Tcur, tLast = 0.0;
+		int Tmax = 0, Tcur, tLast = 0;
 		for (size_t i = 0; i < procNum; i++)
 		{
 			if (sol[i].size()) {
@@ -137,10 +139,10 @@ public:
 		return Tmax; 
 	}
 
-	double idle()
+	int idle()
 	{
-		double sum = 0.0, time = 0.0;
-		double max = this->duration();
+		int sum = 0.0, time = 0.0;
+		int max = this->duration();
 		for (size_t i = 0; i < procNum; i++)
 		{
 			time = 0.0;
@@ -301,12 +303,12 @@ public:
 		return;
 	}
 
-	double getLastTStart(size_t numOfProc, size_t numOfjob)
+	int getLastTStart(size_t numOfProc, size_t numOfjob)
 	{
 		return sol[numOfProc][numOfjob]->getLastTStart();
 	}
 
-	double getDuration(size_t numOfProc, size_t numOfjob)
+	int getDuration(size_t numOfProc, size_t numOfjob)
 	{
 		return sol[numOfProc][numOfjob]->getDuration();
 	}

@@ -9,6 +9,7 @@ private:
 	
 public:
 	temperature(double temp_ = 0) : initTemp(temp_), curTemp(temp_), iter(0) {}
+	
 	temperature * copyOfObj ()
 	{
 		return new temperature(initTemp);	
@@ -20,7 +21,6 @@ public:
 	{
 		return curTemp;
 	}
-
 
 	void decreaseTemp()
 	{
