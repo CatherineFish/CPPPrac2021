@@ -16,9 +16,10 @@ private:
     
     std::vector <solution*> workTask;
     std::mutex writeLock;
+    
 
 public:
-    parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation): procNum(procs) {
+    parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation, int step_ = -1): procNum(procs) {
         curSol = initSol->copyOfObj();
         temp = initTemp->copyOfObj();
         curMutation = initMutation->copyOfObj();

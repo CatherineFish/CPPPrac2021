@@ -21,7 +21,7 @@ private:
  	int step;
 
 public:
-	mainAlgorithm(solution* initSol, temperature * initTemp, mutation* initMutation, solution * best = nullptr, int step_ = 10): step(step_){
+	mainAlgorithm(solution* initSol, temperature * initTemp, mutation* initMutation, solution * best = nullptr, int step_ = -1): step(step_){
 		curMutation = initMutation->copyOfObj();
 		curSol = initSol->copyOfObj();
 		if (best == nullptr) {
@@ -40,37 +40,25 @@ public:
 		delete(curMutation);
 	}
 
-	solution* mainCycle ()
+	solution* mainCycle (std::string filename = "currentSolution.txt")
 	{
-		//std::cout << "MAIN CYCLE\n";
-		//std::string filename = "currentSolution.txt";
-		//std::ofstream file;
-  		//file.open(filename);
-  		//int curStep = 0;
+		if (step != -1) {	
+			std::ofstream file;
+  			file.open(filename);
+  			int curStep = 0;
+		}
 
 		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;
-
 		curCriterion = curSol->getCriterion();
-		
 		bestCriterion = bestSol->getCriterion();
 		
-		//std::cout << "CUR CRIT: " << curCriterion << " GLOB CRIT: " << bestCriterion << std::endl;
 		
 		while (outMaxIter--)
 		{
 			while (inMaxIter--)
 			{
-				//std::cout << "out = " << outMaxIter << " in = " << inMaxIter << std::endl;
 				solution * newSol = curMutation->mutate(curSol->copyOfObj());
 				double newCriterion = newSol->getCriterion();
-				
-				//std::cout << "CUR SOLUTION:\n";
-				//curSol->print();
-		
-				//std::cout << "NEW SOLUTION:\n";
-				//newSol->print();
-				//std::cout << "CUR CRITERION: " << curCriterion << std::endl;
-				//std::cout << "NEW CRITERION: " << newCriterion << std::endl;
 				
 				if (newCriterion < bestCriterion)
 				{
@@ -94,25 +82,24 @@ public:
 				 		curCriterion = newCriterion;					
 					}	
 				}
-				/*curStep++;
-				if (curStep == step) {
-					file.open(filename, std::ios::app);
-					file << "BEST SOLUTION" << std::endl;
-					file.close();
-					bestSol->printNumFile(filename);
-					file.open(filename, std::ios::app);
-  		
-					file << "BEST CRITERION: " << bestCriterion << std::endl << std::endl;
-					
-					file << "CURRENT SOLUTION" << std::endl;
-					file.close();
-					curSol->printNumFile(filename);
-					file.open(filename, std::ios::app);
-  		
-					file << "CURRENT CRITERION: " << curCriterion << std::endl << std::endl << std::endl << std::endl;
-					file.close();
-					curStep = 0;
-				} */
+				if (step != -1) {
+					curStep++;
+					if (curStep == step) {
+						file.open(filename, std::ios::app);
+						file << "BEST SOLUTION" << std::endl;
+						file.close();
+						bestSol->printNumFile(filename);
+						file.open(filename, std::ios::app);
+						file << "BEST CRITERION: " << bestCriterion << std::endl << std::endl;
+						file << "CURRENT SOLUTION" << std::endl;
+						file.close();
+						curSol->printNumFile(filename);
+						file.open(filename, std::ios::app);
+						file << "CURRENT CRITERION: " << curCriterion << std::endl << std::endl << std::endl << std::endl;
+						file.close();
+						curStep = 0;	
+					}
+				}
 					 
 			}
 			temp->decreaseTemp();
