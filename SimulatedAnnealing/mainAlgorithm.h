@@ -16,53 +16,71 @@ private:
 	solution* curSol, *bestSol;
 	temperature* temp;
 	mutation* curMutation;
-	int globOutMaxIter = 10, globInMaxIter = 5;
+	int globOutMaxIter = 1, globInMaxIter = 1;
 	double bestCriterion, curCriterion;
  	int step;
 
 public:
-	mainAlgorithm(solution* initSol, double initTemp, mutation* initMutation, int step_): curMutation(initMutation), step(step_){
+	mainAlgorithm(solution* initSol, temperature * initTemp, mutation* initMutation, solution * best = nullptr, int step_ = 10): step(step_){
+		curMutation = initMutation->copyOfObj();
 		curSol = initSol->copyOfObj();
-		bestSol = initSol->copyOfObj();
-		temp = new temperature(initTemp);
+		if (best == nullptr) {
+			bestSol = initSol->copyOfObj();
+			
+		} else {
+			bestSol = best->copyOfObj();
+		}
+		temp = initTemp->copyOfObj();
 	} 
 	
 	~mainAlgorithm() {
+		std::cout << "DELETER" << std::endl;
 		delete(curSol);
+		std::cout << "SOL DELETER END" << std::endl;
+		
 		delete(bestSol);
+		std::cout << "BEST DELETER END" << std::endl;
+		
 		delete(temp);
+		std::cout << "TEMP DELETER END" << std::endl;
+		
 		delete(curMutation);
+		std::cout << "MUT DELETER END" << std::endl;
+		
 	}
 
 	solution* mainCycle ()
 	{
 		//std::cout << "MAIN CYCLE\n";
-		std::string filename = "currentSolution.txt";
-		std::ofstream file;
-  		file.open(filename);
-  		int curStep = 0;
+		//std::string filename = "currentSolution.txt";
+		//std::ofstream file;
+  		//file.open(filename);
+  		//int curStep = 0;
+
 		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;
+
 		curCriterion = curSol->getCriterion();
+		
 		bestCriterion = bestSol->getCriterion();
-		std::cout << "CUR CRIT: " << curCriterion << " GLOB CRIT: " << bestCriterion << std::endl;
+		
+		//std::cout << "CUR CRIT: " << curCriterion << " GLOB CRIT: " << bestCriterion << std::endl;
+		
 		while (outMaxIter--)
 		{
 			while (inMaxIter--)
 			{
-				std::cout << "out = " << outMaxIter << " in = " << inMaxIter << std::endl;
+				//std::cout << "out = " << outMaxIter << " in = " << inMaxIter << std::endl;
 				solution * newSol = curMutation->mutate(curSol->copyOfObj());
 				double newCriterion = newSol->getCriterion();
 				
-				std::cout << "CUR SOLUTION:\n";
-				curSol->print();
+				//std::cout << "CUR SOLUTION:\n";
+				//curSol->print();
 		
-				std::cout << "NEW SOLUTION:\n";
-				newSol->print();
-				std::cout << "CUR CRITERION: " << curCriterion << std::endl;
-				std::cout << "NEW CRITERION: " << newCriterion << std::endl;
+				//std::cout << "NEW SOLUTION:\n";
+				//newSol->print();
+				//std::cout << "CUR CRITERION: " << curCriterion << std::endl;
+				//std::cout << "NEW CRITERION: " << newCriterion << std::endl;
 				
-				// сначала проверить, лучше ли лучшего
-				// потом сравниваем с текущем
 				if (newCriterion < bestCriterion)
 				{
 					delete bestSol;
@@ -85,7 +103,7 @@ public:
 				 		curCriterion = newCriterion;					
 					}	
 				}
-				curStep++;
+				/*curStep++;
 				if (curStep == step) {
 					file.open(filename, std::ios::app);
 					file << "BEST SOLUTION" << std::endl;
@@ -103,7 +121,7 @@ public:
 					file << "CURRENT CRITERION: " << curCriterion << std::endl << std::endl << std::endl << std::endl;
 					file.close();
 					curStep = 0;
-				} 
+				} */
 					 
 			}
 			temp->decreaseTemp();

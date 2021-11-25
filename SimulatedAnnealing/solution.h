@@ -230,7 +230,7 @@ public:
 		if (j == -1) {
 			return sol[procNum_].size();
 		}
-		std::cout << "j = " << j << " k = " << k << std::endl;
+		//std::cout << "j = " << j << " k = " << k << std::endl;
 		return getRandom<int>(j, k);
 	}
 
@@ -245,7 +245,7 @@ public:
 	{
 		
 		for(std::multimap<double, oneJob *>::iterator it = allJobs.begin(); it != allJobs.end(); ++it) {
-			std::cout << "DUR = " << it->second->getDuration() << " StartTime = " << it->second->getTStart() << std::endl;
+			//std::cout << "DUR = " << it->second->getDuration() << " StartTime = " << it->second->getTStart() << std::endl;
 			it->second->setTStart(it->second->getLastTStart());
 		}
 
@@ -275,7 +275,7 @@ public:
 			return;
 		}
 		std::multimap<double, oneJob *> allJobs;
-		std::cout << "ALL JOBS" << std::endl;
+		//std::cout << "ALL JOBS" << std::endl;
 		
 		for (size_t i = 0; i < sol.size(); i++)
 		{

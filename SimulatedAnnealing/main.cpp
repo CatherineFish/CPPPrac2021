@@ -9,6 +9,7 @@
 #include "solution.h"
 #include "mutation.h"
 #include "temperature.h"
+#include "parallelAlg.h"
 
 std::vector<std::vector<oneJob *>> jobsGroups;
     
@@ -331,7 +332,7 @@ int main(int argc, char * argv[])
     {
         first[i]->setTStart(time);
         time += first[i]->getDuration();
-    }*/
+    }
     if (argc < 2){
         std::cout <<"Incorrect arguments" << std::endl;
         return 0;
@@ -359,4 +360,64 @@ int main(int argc, char * argv[])
     std::cout << "RESULT" << std::endl;
     res->print();
     res->printNum();
+    if (argc < 2){
+        std::cout <<"Incorrect arguments" << std::endl;
+        return 0;
+    }
+    int nProc = std::atoi(argv[1]);
+    */
+    
+    mutation * mut = new mutation();
+
+    oneJob *j_0, *j_1, *j_2, *j_3, *j_4;
+    j_0 = new oneJob(100.0, 0, {});
+    j_1 = new oneJob(50.0, 1, {0, 2});
+    j_2 = new oneJob(12.0, 2, {0});
+    j_3 = new oneJob(8888.0, 3, {4});
+    j_4 = new oneJob(70000.0, 4, {});
+    
+    j_0->initializeJob({});
+    j_1->initializeJob({j_0, j_2});
+    j_2->initializeJob({j_0});
+    j_3->initializeJob({j_4});
+    j_4->initializeJob({});
+    std::vector<std::vector<oneJob *>> initSol;
+    std::vector<oneJob *> first;
+    first.push_back(j_0);
+    first.push_back(j_2);
+    first.push_back(j_1);
+    first.push_back(j_4);
+    first.push_back(j_3);
+    initSol.push_back(first);
+    initSol.push_back(std::vector<oneJob *>());
+    initSol.push_back(std::vector<oneJob *>());
+    solution *sol;
+    double time = 0.0;
+    for (size_t i = 0; i < first.size(); i++)
+    {
+        first[i]->setTStart(time);
+        time += first[i]->getDuration();
+    }
+    
+    sol = new solution(3, initSol);
+    temperature *t = new temperature(1000);
+    //sol->print();
+    //parallelAlgorithm p(nProc);
+    //solution* res = p.run(sol, t, mut);
+    
+    //mainAlgorithm alg(sol, t, mut);
+    //solution *res = alg.mainCycle();
+    //std::cout << "RESULT" << std::endl;
+    //res->print();
+    //res->printNum();
+
+    
+    int th_am;
+
+    std::cout << "Please, print amoint of threads:" << std::endl;
+    std::cin >> th_am;
+    ParallelSimulating sim1(th_am, sol, t, mut);
+    solution * res = sim1.ParralelSolution();
+    
+    
 }
