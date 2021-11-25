@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <fstream>
+#include <chrono>
 
 #include "mainAlgorithm.h"
 #include "solution.h"
@@ -16,7 +17,7 @@
 
 int main(int argc, char * argv[])
 {
-    int mod;
+    /*int mod;
     std::cout << "0 - Generate data, 1 - Algorithm launch, 2 - Schedule analysis:" << std::endl;
     std::cin >> mod;
 
@@ -89,10 +90,12 @@ int main(int argc, char * argv[])
             int threadNum;
             std::cout << "Print number of threads:" << std::endl;
             std::cin >> threadNum;
-            
+            auto start_time_paral = std::chrono::high_resolution_clock::now();
             parallelAlgorithm parallelAlg(threadNum, sol, t, mut);
             res = parallelAlg.parralelSolution();
-
+            auto end_time_paral = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> worktime = end_time_paral - start_time_paral;
+            std::cout << worktime.count() / 1000 << std::endl;
 
         } else {
             std::cout << "Print steps for intermediate solution print or -1:" << std::endl; 
@@ -101,14 +104,18 @@ int main(int argc, char * argv[])
                 std::cout << "Print intermediate solution print filename:" << std::endl; 
                 std::cin >> interFilename;
             }
-    
+            auto start_time_alg = std::chrono::high_resolution_clock::now();
             mainAlgorithm alg(sol, t, mut, nullptr, stepsForPrint);
             
             if (stepsForPrint != -1) {
                 res = alg.mainCycle(interFilename);       
             } else {
                 res = alg.mainCycle();    
-            }    
+            }
+            auto end_time_alg = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> worktime = end_time_alg - start_time_alg;
+            std::cout << worktime.count() / 1000 << std::endl;
+    
         }
 
         
@@ -120,6 +127,90 @@ int main(int argc, char * argv[])
         std::cin >> fileWithSchedule;
         std::cout << "Print input filename :" << std::endl; 
         std::cin >> fileWithJobs;
+        scheduleCharact(fileWithSchedule, fileWithSchedule);
+    }*/
+
+
+    int mod = std::atoi(argv[1]);
+    if (!mod) {
+        int vertexNum = std::atoi(argv[2]);
+        int minWeight = std::atoi(argv[3]), maxWeight = std::atoi(argv[4]);
+        double dispVertexWeight = std::atof(argv[5]);
+        double compNum = std::atof(argv[6]), dispComp = std::atof(argv[7]);
+        double vertexDegree = std::atof(argv[8]), dispDegree = std::atof(argv[9]);  
+        std::string txtFileName, dotFileName;  
+        
+        generator * newGen = new generator(vertexNum, minWeight, maxWeight, dispVertexWeight,
+                                           compNum, dispComp, vertexDegree, dispDegree);    
+        newGen->compInitialize();
+        newGen->degreeInitialize();
+
+        txtFileName = argv[10];
+        dotFileName = argv[11];
+        
+        newGen->inputFormat(txtFileName);
+        newGen->dotFormat(dotFileName);
+    } else if (mod == 1) {
+        std::srand(std::time(nullptr));
+        int procNum, stepsForPrint;
+        double initTemp;
+        std::string inFilename, outFilename, interFilename;
+
+        inFilename = argv[2];
+        
+        procNum = std::atoi(argv[3]);
+        
+        initTemp = std::atof(argv[4]);
+        
+        outFilename = argv[5];
+
+        std::vector<oneJob *> allJobs = parser(inFilename);
+        parseJobs * parser = new parseJobs();
+        solution * sol = parser->initSol(allJobs, procNum);
+        temperature *t = new temperature(initTemp);
+        mutation * mut = new mutation();
+
+        mod = std::atoi(argv[6]);
+        solution * res;
+        if (!mod) {
+            int threadNum;
+            threadNum = std::atoi(argv[7]);
+            auto start_time_paral = std::chrono::high_resolution_clock::now();
+            parallelAlgorithm parallelAlg(threadNum, sol, t, mut);
+            res = parallelAlg.parralelSolution();
+            auto end_time_paral = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> worktime = end_time_paral - start_time_paral;
+            std::cout << worktime.count() / 1000 << std::endl;
+
+        } else {
+            stepsForPrint = std::atoi(argv[7]);
+            if (stepsForPrint != -1) {
+                std::cout << "Print intermediate solution print filename:" << std::endl; 
+                std::cin >> interFilename;
+            }
+            auto start_time_alg = std::chrono::high_resolution_clock::now();
+            mainAlgorithm alg(sol, t, mut, nullptr, stepsForPrint);
+            
+            if (stepsForPrint != -1) {
+                res = alg.mainCycle(interFilename);       
+            } else {
+                res = alg.mainCycle();    
+            }
+            auto end_time_alg = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> worktime = end_time_alg - start_time_alg;
+            std::cout << worktime.count() / 1000 << std::endl;
+            
+        }
+
+        std::cout << "HERE" << std::endl;
+        //res->print();
+        res->printRESULTNumFile(outFilename);
+        std::cout << "HERE" << std::endl;
+        
+    } else if (mod == 2) {
+        std::string fileWithSchedule, fileWithJobs;
+        fileWithSchedule = argv[2];
+        fileWithJobs = argv[3];
         scheduleCharact(fileWithSchedule, fileWithSchedule);
     }
     return 0;

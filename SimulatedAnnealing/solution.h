@@ -339,7 +339,9 @@ public:
 
     void printRESULTNumFile(std::string filename)
     {
+        std::cout << "HERE " << filename << std::endl;
         std::ofstream file(filename);
+        std::cout << sol.size() << std::endl;
         
         file << sol.size() << std::endl;
         for (size_t i = 0; i < sol.size(); i++)
