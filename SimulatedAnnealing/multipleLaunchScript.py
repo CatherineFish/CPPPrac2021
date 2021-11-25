@@ -41,7 +41,7 @@ with open("data/PARALLEL_JobTime.txt", 'w') as resFile:
         with open(curFile, 'r') as file:
             for line in file:
                 sumTime = reduce(lambda a, b: float(a) + float(b), (line.split()))
-            resLine += str(sumTime) + " "
+            resLine += str(sumTime) + " " 
     resFile.write(resLine)
 
 print("SECOND TEST\n")
@@ -64,7 +64,7 @@ with open("data/ACC_JobTime.txt", 'w') as resFile:
             line = line.split()
             initTime = float(line[0]); 
             for elem in line:
-                resLine += str(float(elem) / initTime) + " "
+                resLine += str(float(elem) / initTime)  + " " 
     resFile.write(resLine)
 
 print("THIRD TEST\n")
@@ -100,16 +100,16 @@ for i in range(20):
     for proc in range(10, 200, 20):
         filename = "data/procTest_" + str(proc) + ".txt"
         result = "data/PROC_" + str(proc) + ".txt"
-        subprocess.check_call([f"./main 0 {inFile} {proc} 500 {filename} 1 -1 >> {result}"], shell=True)
+        subprocess.check_call([f"./main 1 {inFile} {proc} 500 {filename} 1 -1 >> {result}"], shell=True)
 
 with open("data/ProcTime.txt", 'w') as resFile:  
     resLine = ""
-    for job in range(10, 1000, 100):
-        curFile = "data/PROC_" + str(job) + ".txt"
+    for proc in range(10, 200, 20):
+        curFile = "data/PROC_" + str(proc) + ".txt"
         with open(curFile, 'r') as file:
             for line in file:
                 sumTime = reduce(lambda a, b: float(a) + float(b), (line.split()))
-            resLine += str(sumTime) + " "
+            resLine += str(sumTime) + " " 
     resFile.write(resLine)
 
 print("FIFTH TEST\n")
@@ -119,6 +119,4 @@ subprocess.check_call(["rm data/PARALLEL_jobTest_* data/PARALLEL_JOB_*"], shell=
 subprocess.check_call(["rm data/jobTest_* data/JOB_*"], shell=True)
 subprocess.check_call(["rm data/procTest_* data/PROC_*"], shell=True)
 
-
-#
 

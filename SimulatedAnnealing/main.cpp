@@ -129,8 +129,7 @@ int main(int argc, char * argv[])
         std::cin >> fileWithJobs;
         scheduleCharact(fileWithSchedule, fileWithSchedule);
     }*/
-
-
+    
     int mod = std::atoi(argv[1]);
     if (!mod) {
         int vertexNum = std::atoi(argv[2]);
@@ -157,19 +156,15 @@ int main(int argc, char * argv[])
         std::string inFilename, outFilename, interFilename;
 
         inFilename = argv[2];
-        
         procNum = std::atoi(argv[3]);
-        
         initTemp = std::atof(argv[4]);
-        
         outFilename = argv[5];
-
         std::vector<oneJob *> allJobs = parser(inFilename);
         parseJobs * parser = new parseJobs();
         solution * sol = parser->initSol(allJobs, procNum);
         temperature *t = new temperature(initTemp);
         mutation * mut = new mutation();
-
+        
         mod = std::atoi(argv[6]);
         solution * res;
         if (!mod) {
@@ -181,16 +176,12 @@ int main(int argc, char * argv[])
             auto end_time_paral = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> worktime = end_time_paral - start_time_paral;
             std::cout << worktime.count() / 1000 << std::endl;
+            res->printRESULTNumFile(outFilename);
 
         } else {
             stepsForPrint = std::atoi(argv[7]);
-            if (stepsForPrint != -1) {
-                std::cout << "Print intermediate solution print filename:" << std::endl; 
-                std::cin >> interFilename;
-            }
             auto start_time_alg = std::chrono::high_resolution_clock::now();
             mainAlgorithm alg(sol, t, mut, nullptr, stepsForPrint);
-            
             if (stepsForPrint != -1) {
                 res = alg.mainCycle(interFilename);       
             } else {
@@ -199,13 +190,12 @@ int main(int argc, char * argv[])
             auto end_time_alg = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> worktime = end_time_alg - start_time_alg;
             std::cout << worktime.count() / 1000 << std::endl;
-            
+            res->printRESULTNumFile(outFilename);
+    
         }
 
-        std::cout << "HERE" << std::endl;
+        
         //res->print();
-        res->printRESULTNumFile(outFilename);
-        std::cout << "HERE" << std::endl;
         
     } else if (mod == 2) {
         std::string fileWithSchedule, fileWithJobs;
