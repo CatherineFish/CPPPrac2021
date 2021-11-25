@@ -19,25 +19,43 @@ std::vector<oneJob *> parser(std::string filename) {
     std::string line;
     std::vector<oneJob *> allJobs;
     size_t i = 0;
+    int N;
     std::ifstream file(filename);
-    std::getline(file, line);
+    while (std::getline(file, line)){
+        if (line[0] == '#' || line[0] == ' ') continue;
+        else {
+            std::istringstream curLine(line);
+            curLine >> N;    
+            break;
+        }
+    }
     while (std::getline(file, line))
     {
+        if (line[0] == '#' || line[0] == ' ') continue;
         //std::cout <<"WOW" << std::endl;
         std::istringstream jobLine(line);
         int jobDur, dependence;
         jobLine >> jobDur;
+
         //std::cout << "DUR: " << jobDur << std::endl;
         oneJob* newJob = new oneJob(jobDur, i);
         i++;
         //std::cout << "DEP: ";
         
         while (jobLine >> dependence) {
+            if (dependence >= N) {
+                std::cout << "Invalid input" << std::endl;
+                exit(0);
+            }
             newJob->depNum.push_back(dependence);
             //std::cout << dependence << " ";
         }
         //std::cout << std::endl;
         allJobs.push_back(newJob);
+    }
+    if (i < N) {
+        std::cout << "Invalid input" << std::endl;
+        exit(0);
     }
     //std::cout <<"YEA" << std::endl;
         
@@ -194,6 +212,94 @@ solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
     return new solution(procNum, initSol);
 }
 
+std::vector<std::vector<int>> parseShedule(std::string filename) {
+    std::string line;
+    std::vector<std::vector<int>> schedule;
+    int N;
+    size_t i = 0;
+    std::ifstream file(filename);
+    while (std::getline(file, line)){
+        if (line[0] == '#' || line[0] == ' ') continue;
+        else {
+            std::istringstream curLine(line);
+            curLine >> N;    
+            break;
+        }
+    }
+    while (std::getline(file, line))
+    {
+        if (line[0] == '#' || line[0] == ' ') continue;
+        //std::cout <<"WOW" << std::endl;
+        std::istringstream procLine(line);
+        int procNum, newJob;
+        char c;
+        procLine >> procNum;
+        procLine >> c;
+        std::vector<int> newVect;
+        
+        i++;
+        
+        while (procLine >> newJob) {
+            newVect.push_back(newJob);
+        }
+        //std::cout << std::endl;
+        schedule.push_back(newVect);
+    }
+    if (i < N) {
+        std::cout << "Invalid input" << std::endl;
+        exit(0);
+    }
+    return schedule;
+}
+
+void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
+    std::vector<oneJob *> allJobs = parser(fileWithJobs);
+    std::vector<std::vector<int>> schedule = parseShedule(fileWithSchedule);
+    std::vector<std::vector<oneJob*>> jobSchedule;
+    for (size_t i = 0; i < schedule.size(); i++) {
+        std::vector<oneJob*> newElem;
+        for (size_t j = 0; j < schedule[i].size(); j++) {
+            newElem.push_back(allJobs[schedule[i][j]]);
+            allJobs[schedule[i][j]]->proc = i;
+        }
+        jobSchedule.push_back(newElem);
+    }
+
+    for (size_t i = 0; i < allJobs.size() - 1; i++)
+    {
+        for (size_t j = 0; j < allJobs.size() - 1 - i; j++)
+        {
+            if (compare(allJobs[j], allJobs[j + 1])){
+                oneJob * job = allJobs[j + 1];
+                allJobs.erase(allJobs.begin() + j + 1);
+                allJobs.insert(allJobs.begin() + j, job);
+            }
+        }
+    }
+
+    for (size_t i = 0; i < allJobs.size(); i++) {
+        double mainStart = 0;
+        for (size_t j = 0; j < schedule[allJobs[i]->proc].size(); j++) {
+            jobSchedule[allJobs[i]->proc][j]->setTStart(std::max(mainStart, jobSchedule[allJobs[i]->proc][j]->getLastTStart()));
+            mainStart = jobSchedule[allJobs[i]->proc][j]->getTStart() + jobSchedule[allJobs[i]->proc][j]->getDuration();
+            if (jobSchedule[allJobs[i]->proc][j] == allJobs[i]) {
+                break;
+            }
+        }
+    }
+
+    solution * sol = new solution(schedule.size(), jobSchedule);
+    double disbalance = sol->getCriterion();
+    double duration = sol->duration(); 
+    double idling = sol->idle();
+    std::cout << "Solution characteristics:" << std::endl;
+    std::cout << "Duration : " << duration << std::endl;
+    std::cout << "Disbalance : " << disbalance << std::endl;
+    std::cout << "Idle time : " << idling << std::endl;
+    return;
+
+}
+
 int main(int argc, char * argv[])
 {
         
@@ -232,7 +338,7 @@ int main(int argc, char * argv[])
     }
     int stepsForPrint = std::atoi(argv[1]);
     int procNum = 3;
-    std::vector<oneJob *> allJobs = parser("in.txt");
+    std::vector<oneJob *> allJobs = parser("strangeIn.txt");
     for (size_t i = 0; i < allJobs.size(); i++) {
         std::cout << allJobs[i]->getNum() << " Dur: " << allJobs[i]->getDuration() << " dependence: ";
         for (auto dep: allJobs[i]->depNum) {

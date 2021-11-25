@@ -13,7 +13,7 @@ private:
 public:
 	std::vector<oneJob *> dependences = {};
 	std::vector<size_t> depNum;
-
+	int proc;
 	oneJob(double dur, size_t num_): duration(dur), num(num_) 
 	{}
 
@@ -117,6 +117,41 @@ public:
 		}
 		return Tmax - Tmin; 
 	}
+
+	double duration()
+	{
+		double Tmax = 0.0, Tcur, tLast = 0.0;
+		for (size_t i = 0; i < procNum; i++)
+		{
+			if (sol[i].size()) {
+				Tcur = sol[i][sol[i].size() - 1]->getTStart() + sol[i][sol[i].size() - 1]->getDuration();
+				if (Tcur > Tmax)
+				{
+					Tmax = Tcur;
+				}
+				
+			} 
+			
+		}
+		
+		return Tmax; 
+	}
+
+	double idle()
+	{
+		double sum = 0.0, time = 0.0;
+		double max = this->duration();
+		for (size_t i = 0; i < procNum; i++)
+		{
+			time = 0.0;
+			for (size_t j = 0; j < sol[i].size(); j++) {
+				sum += sol[i][j]->getTStart() - time;
+				time = sol[i][j]->getTStart() + sol[i][j]->getDuration();
+			}
+			sum += max - time;
+		}
+		return sum; 
+	}	
 
 	solution * copyOfObj()
 	{
