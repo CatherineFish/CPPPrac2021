@@ -45,10 +45,10 @@ int main(int argc, char * argv[])
         std::cout << "Print vertex degree variance:" << std::endl;
         std::cin >> dispDegree;
 
-        generator * newGen = nem generator(vertexNum, minWeight, maxWeight, dispVertexWeight,
+        generator * newGen = new generator(vertexNum, minWeight, maxWeight, dispVertexWeight,
                                            compNum, dispComp, vertexDegree, dispDegree);    
         newGen->compInitialize();
-        newGen->degreeInitialize(vertexDegree, dispDegree);
+        newGen->degreeInitialize();
 
         std::cout << "Print txt file name (without .txt):" << std::endl; 
         std::cin >> txtFileName;
@@ -84,14 +84,15 @@ int main(int argc, char * argv[])
 
         std::cout << "0 - Parallel Algorithm, 1 - Sequential Algorithm:" << std::endl;
         std::cin >> mod;
-
+        solution * res;
         if (!mod) {
             int threadNum;
             std::cout << "Print number of threads:" << std::endl;
             std::cin >> threadNum;
             
-            parallelAlgorithm parallelAlg(th_am, sol, t, mut);
-            solution * res = parallelAlg.parralelSolution();
+            parallelAlgorithm parallelAlg(threadNum, sol, t, mut);
+            res = parallelAlg.parralelSolution();
+
 
         } else {
             std::cout << "Print steps for intermediate solution print or -1:" << std::endl; 
@@ -104,9 +105,9 @@ int main(int argc, char * argv[])
             mainAlgorithm alg(sol, t, mut, nullptr, stepsForPrint);
             
             if (stepsForPrint != -1) {
-                solution *res = alg.mainCycle(interFilename);       
+                res = alg.mainCycle(interFilename);       
             } else {
-                solution *res = alg.mainCycle();    
+                res = alg.mainCycle();    
             }    
         }
 

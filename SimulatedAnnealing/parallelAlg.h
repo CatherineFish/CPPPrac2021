@@ -19,7 +19,7 @@ private:
     
 
 public:
-    parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation, int step_ = -1): procNum(procs) {
+    parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation): procNum(procs) {
         curSol = initSol->copyOfObj();
         temp = initTemp->copyOfObj();
         curMutation = initMutation->copyOfObj();

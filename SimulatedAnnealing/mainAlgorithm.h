@@ -42,10 +42,11 @@ public:
 
 	solution* mainCycle (std::string filename = "currentSolution.txt")
 	{
+		std::ofstream file;
+  		int curStep = 0;
 		if (step != -1) {	
-			std::ofstream file;
-  			file.open(filename);
-  			int curStep = 0;
+			file.open(filename);
+  			
 		}
 
 		int inMaxIter = globInMaxIter, outMaxIter = globOutMaxIter;

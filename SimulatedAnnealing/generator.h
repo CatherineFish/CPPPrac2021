@@ -11,7 +11,7 @@ class generator {
 private:
 	std::random_device rd{};
     std::mt19937 gen{rd()};
-    int vertexNum, minWeight, maxWeight, 
+    int vertexNum, minWeight, maxWeight; 
     double dispVertexWeight, compNum, dispComp;
     double vertexDegree, dispDegree;
 	std::vector<std::pair<oneJob *, std::pair<int, int>>> allJobs;
@@ -26,10 +26,10 @@ public:
 		}
 	}
 
-	int distForWeight(int min, int max, int disp){
+	int distForWeight(int min, int max, double disp){
 		//std::random_device rd{};
 	    //std::mt19937 gen{rd()};
-	    std::normal_distribution<> dist{(max - min) / 2, disp}; 
+	    std::normal_distribution<> dist{(double)(max - min) / 2, disp}; 
 	    int res = std::round(dist(gen));
 	    while (res < min || res > max) {
 	    	res = std::round(dist(gen));
@@ -197,32 +197,3 @@ public:
 	}
 	
 };
-
-	
-int main (int argc, char * argv[]) 
-{
-	if (argc < 9){
-		std::cout <<"Incorrect arguments" << std::endl;
-		return 0;
-	}
-	int vertexNum = std::atoi(argv[1]);
-	int minWeight = std::atoi(argv[2]), maxWeight = std::atoi(argv[3]);
-	double dispVertexWeight = std::atof(argv[4]);
-	double compNum = std::atof(argv[5]), dispComp = std::atof(argv[6]);
-	double vertexDegree = std::atof(argv[7]), dispDegree = std::atof(argv[8]);
-
-	generator * newGen = nem generator(vertexNum, minWeight, maxWeight, dispVertexWeight,
-									   compNum, dispComp, vertexDegree, dispDegree);	
-
-
-	newGen->compInitialize();
-	
-	//print();
-	//std::cout << "\n=================================\n" << std::endl;
-	
-	newGen->degreeInitialize(vertexDegree, dispDegree);
-	//print();
-	newGen->inputFormat("in");
-	newGen->dotFormat("forGraph");
-	return 0;
-}

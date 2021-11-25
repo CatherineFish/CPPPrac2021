@@ -79,6 +79,21 @@ std::vector<std::vector<int>> parseShedule(std::string filename) {
     return schedule;
 }
 
+int compare (oneJob* arg1, oneJob * arg2) {
+    for (auto dep_1: arg1->depNum) {
+        if (dep_1 == arg2->getNum()) {
+            return 1;
+        }
+    }
+
+    for (auto dep_2: arg2->depNum) {
+        if (dep_2 == arg1->getNum()) {
+            return 0;
+        }
+    }
+    return 0;
+}
+
 void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
     std::vector<oneJob *> allJobs = parser(fileWithJobs);
     std::vector<std::vector<int>> schedule = parseShedule(fileWithSchedule);
@@ -134,21 +149,7 @@ private:
 public:
     parseJobs () {}
 
-    int compare (oneJob* arg1, oneJob * arg2)
-    {
-        for (auto dep_1: arg1->depNum) {
-            if (dep_1 == arg2->getNum()) {
-                return 1;
-            }
-        }
     
-        for (auto dep_2: arg2->depNum) {
-            if (dep_2 == arg1->getNum()) {
-                return 0;
-            }
-        }
-        return 0;
-    }
     
     void bubbleSort(int k)
     {
@@ -240,4 +241,4 @@ public:
         return new solution(procNum, initSol);
     }
 
-}
+};
