@@ -26,8 +26,6 @@ public:
     }
 
     void InitWorkTask( solution* best){
-        std::cout << "HERE INIT" << std::endl;
-        
         mainAlgorithm sim(curSol, temp, curMutation, best);
         solution* sol = sim.mainCycle()->copyOfObj();
         writelock.lock();
@@ -38,9 +36,9 @@ public:
     solution* ParralelSolution() {
         std::vector<std::thread> thread_vec(num_procs);
         solution* best = nullptr;
-        int it=0;
+        int it = 0;
 
-        while (it<10) {
+        while (it < 10) {
 
             for (size_t i = 0; i < num_procs; i++)
                 thread_vec[i] = std::thread(&ParallelSimulating::InitWorkTask, this, best);
@@ -48,8 +46,7 @@ public:
             for (auto &th: thread_vec)
                 if (th.joinable())
                     th.join();
-            std::cout << "HERE" << std::endl;
-        
+    
             if (best) {
                 solution* new_solution = this->GetBestSolution();
                 if (new_solution->getCriterion() < best->getCriterion()) {

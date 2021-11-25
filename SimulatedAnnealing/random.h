@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdlib>
+#include <ctime>
 
 template <typename T>
 T getRandom(T min, T max) {

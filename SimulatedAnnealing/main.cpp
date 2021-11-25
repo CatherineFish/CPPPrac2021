@@ -303,6 +303,8 @@ void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
 
 int main(int argc, char * argv[])
 {
+    std::srand(std::time(nullptr));
+    
         
     /*oneJob *j_0, *j_1, *j_2, *j_3, *j_4;
     j_0 = new oneJob(100.0, 0, {});
@@ -418,6 +420,6 @@ int main(int argc, char * argv[])
     std::cin >> th_am;
     ParallelSimulating sim1(th_am, sol, t, mut);
     solution * res = sim1.ParralelSolution();
-    
+    res->print();
     
 }

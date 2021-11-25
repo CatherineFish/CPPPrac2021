@@ -34,19 +34,10 @@ public:
 	} 
 	
 	~mainAlgorithm() {
-		std::cout << "DELETER" << std::endl;
 		delete(curSol);
-		std::cout << "SOL DELETER END" << std::endl;
-		
 		delete(bestSol);
-		std::cout << "BEST DELETER END" << std::endl;
-		
 		delete(temp);
-		std::cout << "TEMP DELETER END" << std::endl;
-		
 		delete(curMutation);
-		std::cout << "MUT DELETER END" << std::endl;
-		
 	}
 
 	solution* mainCycle ()
