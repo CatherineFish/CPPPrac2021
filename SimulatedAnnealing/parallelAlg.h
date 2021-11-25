@@ -7,48 +7,46 @@
 #include <algorithm>
 
 
-class ParallelSimulating{
+class parallelAlgorithm{
 private:
-    int num_procs;
+    int procNum;
     solution* curSol;
     temperature* temp;
     mutation* curMutation;
     
-    std::vector <int> inform;
-    std::vector <solution *> worktask;
-    std::mutex writelock;
+    std::vector <solution*> workTask;
+    std::mutex writeLock;
 
 public:
-    ParallelSimulating(int procs, solution* initSol, temperature * initTemp, mutation* initMutation): num_procs(procs), curMutation(initMutation) {
+    parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation): procNum(procs) {
         curSol = initSol->copyOfObj();
         temp = initTemp->copyOfObj();
-
+        curMutation = initMutation->copyOfObj();
     }
 
-    void InitWorkTask( solution* best){
-        mainAlgorithm sim(curSol, temp, curMutation, best);
-        solution* sol = sim.mainCycle()->copyOfObj();
-        writelock.lock();
-        worktask.emplace_back(sol);
-        writelock.unlock();
+    void initialization(solution* best){
+        mainAlgorithm mainSol(curSol, temp, curMutation, best);
+        solution* sol = mainSol.mainCycle()->copyOfObj();
+        writeLock.lock();
+        workTask.emplace_back(sol);
+        writeLock.unlock();
     };
 
-    solution* ParralelSolution() {
-        std::vector<std::thread> thread_vec(num_procs);
+    solution* parralelSolution() {
+        std::vector<std::thread> threadVec(procNum);
         solution* best = nullptr;
         int it = 0;
 
         while (it < 10) {
+            for (size_t i = 0; i < procNum; i++)
+                threadVec[i] = std::thread(&parallelAlgorithm::initialization, this, best);
 
-            for (size_t i = 0; i < num_procs; i++)
-                thread_vec[i] = std::thread(&ParallelSimulating::InitWorkTask, this, best);
-
-            for (auto &th: thread_vec)
+            for (auto &th: threadVec)
                 if (th.joinable())
                     th.join();
     
             if (best) {
-                solution* new_solution = this->GetBestSolution();
+                solution* new_solution = this->getBestSolution();
                 if (new_solution->getCriterion() < best->getCriterion()) {
                     delete best;
                     best = new_solution->copyOfObj();
@@ -59,32 +57,28 @@ public:
                     it++;
                 }
             } else {
-                best = this->GetBestSolution()->copyOfObj();
+                best = this->getBestSolution()->copyOfObj();
                 it=1;
             }
-            thread_vec.clear();
-            thread_vec.resize(num_procs);
-            worktask.clear();
+            threadVec.clear();
+            threadVec.resize(procNum);
+            workTask.clear();
         }
         return best;
-
     }
 
-
-
-    solution* GetBestSolution() {
-        std::vector <int> allcrit;
+    solution* getBestSolution() {
+        std::vector <int> allCrit;
         solution* tst = nullptr;
-        for (auto &it: worktask)
-            allcrit.emplace_back(it->getCriterion());
+        for (auto &it: workTask)
+            allCrit.emplace_back(it->getCriterion());
 
-        int max = *std::max_element(allcrit.begin(), allcrit.end());
-        for (auto it: worktask) {
+        int max = *std::max_element(allCrit.begin(), allCrit.end());
+        for (auto it: workTask) {
             if (it->getCriterion() == max)
                 tst = it->copyOfObj();
             delete(it);
         }
         return tst;
     }
-
 };

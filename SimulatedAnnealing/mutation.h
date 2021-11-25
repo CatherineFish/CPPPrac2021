@@ -22,7 +22,6 @@ public:
 			sol->insertJob(std::move(j), newNumOfProc, newNumOfjob, false);	
 		} else {
 			sol->insertJob(std::move(j), newNumOfProc, newNumOfjob, true);
-		
 		}
 		return sol;
 	}
