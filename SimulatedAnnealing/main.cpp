@@ -112,7 +112,7 @@ int main(int argc, char * argv[])
         }
 
         
-        res->print();
+        //res->print();
         res->printRESULTNumFile(outFilename);
     } else if (mod == 2) {
         std::string fileWithSchedule, fileWithJobs;
