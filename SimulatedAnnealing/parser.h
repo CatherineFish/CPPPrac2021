@@ -1,3 +1,7 @@
+#pragma once
+
+#include "job.h"
+
 std::vector<oneJob *> parser(std::string filename) {
 
     std::string line;
@@ -30,7 +34,7 @@ std::vector<oneJob *> parser(std::string filename) {
             }
             newJob->depNum.push_back(dependence);
         }
-        allJobs.push_back(newJob);
+        allJobs.push_back(std::move(newJob));
     }
     if (i < N) {
         std::cout << "Invalid input" << std::endl;
@@ -79,25 +83,12 @@ std::vector<std::vector<int>> parseShedule(std::string filename) {
     return schedule;
 }
 
-int compare (oneJob* arg1, oneJob * arg2) {
-    for (auto dep_1: arg1->depNum) {
-        if (dep_1 == arg2->getNum()) {
-            return 1;
-        }
-    }
-
-    for (auto dep_2: arg2->depNum) {
-        if (dep_2 == arg1->getNum()) {
-            return 0;
-        }
-    }
-    return 0;
-}
 
 void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
     std::vector<oneJob *> allJobs = parser(fileWithJobs);
     std::vector<std::vector<int>> schedule = parseShedule(fileWithSchedule);
     std::vector<std::vector<oneJob*>> jobSchedule;
+    
     for (size_t i = 0; i < schedule.size(); i++) {
         std::vector<oneJob*> newElem;
         for (size_t j = 0; j < schedule[i].size(); j++) {
@@ -106,6 +97,7 @@ void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
         }
         jobSchedule.push_back(newElem);
     }
+    
 
     for (size_t i = 0; i < allJobs.size() - 1; i++)
     {
@@ -118,22 +110,36 @@ void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
             }
         }
     }
+    
+    
+    
+    for(auto job: allJobs) {
+        std::vector<oneJob*> curDep;
+        for (auto k: job->depNum)
+        {
+            curDep.push_back(allJobs[k]);
+        }
+        job->initializeJob(curDep);
+    }    
 
     for (size_t i = 0; i < allJobs.size(); i++) {
-        int mainStart = 0;
+        int mainStart = 0;    
         for (size_t j = 0; j < schedule[allJobs[i]->proc].size(); j++) {
             jobSchedule[allJobs[i]->proc][j]->setTStart(std::max(mainStart, jobSchedule[allJobs[i]->proc][j]->getLastTStart()));
             mainStart = jobSchedule[allJobs[i]->proc][j]->getTStart() + jobSchedule[allJobs[i]->proc][j]->getDuration();
-            if (jobSchedule[allJobs[i]->proc][j] == allJobs[i]) {
-                break;
-            }
+            
         }
     }
-
+    
     solution * sol = new solution(schedule.size(), jobSchedule);
     int disbalance = sol->getCriterion();
     int duration = sol->duration(); 
     int idling = sol->idle();
+    std::cout << std::endl;
+    sol->print();
+    std::cout << std::endl;    
+    sol->printNum();
+    std::cout << std::endl;    
     std::cout << "Solution characteristics:" << std::endl;
     std::cout << "Duration : " << duration << std::endl;
     std::cout << "Disbalance : " << disbalance << std::endl;
@@ -146,9 +152,28 @@ void scheduleCharact(std::string fileWithSchedule, std::string fileWithJobs) {
 class parseJobs {
 private:
     std::vector<std::vector<oneJob *>> jobsGroups;
+        
 public:
-    parseJobs () {}
 
+    std::vector<std::vector<oneJob *>> initSol;
+    
+    parseJobs () {}
+    ~parseJobs() {
+        for (size_t i = 0; i < jobsGroups.size(); i++) {
+            for (size_t j = 0; j < jobsGroups[i].size(); j++) {
+                if (jobsGroups[i][j] != nullptr) {
+                    delete jobsGroups[i][j];
+                }
+            }
+        }
+        for (size_t i = 0; i < initSol.size(); i++) {
+            for (size_t j = 0; j < initSol[i].size(); j++) {
+                if (initSol[i][j] != nullptr) {
+                    delete initSol[i][j];
+                }
+            }
+        }
+    }
     
     
     void bubbleSort(int k)
@@ -170,8 +195,7 @@ public:
     }
     
     
-    solution * initSol (std::vector<oneJob*> allJobs, int procNum) {
-        std::vector<std::vector<oneJob *>> initSol;
+    solution * initSolution (std::vector<oneJob*> allJobs, int procNum) {
         for (size_t i = 0; i < allJobs.size(); i++) {
             bool isInGroup = false;
             for (size_t j = 0; j < jobsGroups.size(); j++) {

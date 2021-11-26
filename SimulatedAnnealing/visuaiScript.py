@@ -3,10 +3,17 @@ import matplotlib.pyplot as plt
 #ParallelTimeFromThreadsNum
 xaxis = list(range(1, 10))
 yaxis = []
-  
+
 with open("data/PARALLEL_ThreadTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
+
+print(yaxis)
+print(xaxis)
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
+print(yaxis)
+print(xaxis)
 fig, ax = plt.subplots(figsize = (10, 10))
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="threads num", ylabel="time, seconds")
@@ -21,6 +28,8 @@ yaxis = []
 with open("data/PARALLEL_JobTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
 fig, ax = plt.subplots(figsize = (10, 10))
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="jobs num", ylabel="time, seconds")
@@ -34,7 +43,8 @@ fig, ax = plt.subplots(figsize = (10, 10))
 with open("data/ACC_ThreadTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
-
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="threads num", ylabel="times")
 ax.set_title("Параллельный алгоритм. Зависимость ускорения от числа потоков")  
@@ -48,7 +58,8 @@ fig, ax = plt.subplots(figsize = (10, 10))
 with open("data/ACC_JobTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
-
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="jobs num", ylabel="times")
 ax.set_title("Параллельный алгоритм. Зависимость ускорения от числа работ")  
@@ -62,7 +73,8 @@ fig, ax = plt.subplots(figsize = (10, 10))
 with open("data/JobTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
-
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="jobs num", ylabel="time, seconds")
 ax.set_title("Последовательный алгоритм. Зависимость времени работы от числа работ")  
@@ -76,6 +88,8 @@ yaxis = []
 with open("data/ProcTime.txt", 'r') as resFile:  
     for line in resFile:
         yaxis += line.split()
+xaxis = [x for _, x in sorted(zip(yaxis, xaxis))]  
+yaxis.sort()
 fig, ax = plt.subplots(figsize = (10, 10))
 ax.plot(xaxis, yaxis)
 ax.set(xlabel="processors num", ylabel="time, seconds")

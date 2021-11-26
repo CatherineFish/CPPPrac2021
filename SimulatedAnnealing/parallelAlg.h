@@ -19,6 +19,16 @@ private:
     
 
 public:
+    ~parallelAlgorithm() {
+        delete curSol;
+        delete temp;
+        delete curMutation;
+        for (size_t i = 0; i < workTask.size(); i++) {
+            if (workTask[i] != nullptr){
+                delete workTask[i];
+            }
+        }
+    }
     parallelAlgorithm(int procs, solution* initSol, temperature * initTemp, mutation* initMutation): procNum(procs) {
         curSol = initSol->copyOfObj();
         temp = initTemp->copyOfObj();

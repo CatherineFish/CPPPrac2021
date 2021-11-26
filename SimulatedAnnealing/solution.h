@@ -4,69 +4,22 @@
 #include <map>
 #include <iostream>
 #include "random.h"
+#include "job.h"
 
-class oneJob
-{
-private:
-    int duration, tStart = 0;
-    size_t num;
-public:
-    std::vector<oneJob *> dependences = {};
-    std::vector<size_t> depNum;
-    int proc;
-    
-    oneJob(int dur, size_t num_): duration(dur), num(num_) 
-    {}
-
-    oneJob(int dur, size_t num_, std::vector<size_t> depNum_): duration(dur), num(num_) 
-    {
-        for (auto i: depNum_){
-            depNum.push_back(i);
+int compare (oneJob* arg1, oneJob * arg2) {
+    for (auto dep_1: arg1->depNum) {
+        if (dep_1 == arg2->getNum()) {
+            return 1;
         }
     }
 
-    void initializeJob(std::vector<oneJob *> dep)
-    {
-        for (size_t i = 0; i < dep.size(); i++)
-        {
-            dependences.push_back(dep[i]);
+    for (auto dep_2: arg2->depNum) {
+        if (dep_2 == arg1->getNum()) {
+            return 0;
         }
-        return;
     }
-
-    int getDuration ()
-    {
-        return duration;
-    }
-
-    int getTStart ()
-    {
-        return tStart;
-    }
-    
-    size_t getNum ()
-    {
-        return num;
-    }
-    
-    int getLastTStart()
-    {
-        int time = 0;
-        for (auto i: dependences)
-        {
-            time = std::max(time, i->getTStart() + i->getDuration());
-        }
-        return time;
-    }
-
-    void setTStart(int time)
-    {
-        tStart = time;
-        return;
-    }
-
-};
-
+    return 0;
+}
 
 
 class solution
@@ -77,7 +30,15 @@ private:
     std::vector<std::vector<oneJob *>> sol;
 
 public:
-
+    ~solution(){
+        for (size_t i = 0; i < sol.size(); i++) {
+            for (size_t j = 0; j < sol[i].size(); j++) {
+                if (sol[i][j] != nullptr) 
+                    delete sol[i][j];
+            }        
+        }
+        std::vector<std::vector<oneJob *>>().swap(sol);
+    } 
     solution(size_t procNum_, std::vector<std::vector<oneJob *>> sol_): procNum(procNum_){
         for (size_t i = 0; i < procNum; i++) {
             sol.emplace_back(std::vector<oneJob *>());
@@ -97,6 +58,9 @@ public:
                 Tcur = sol[i][sol[i].size() - 1]->getTStart() + sol[i][sol[i].size() - 1]->getDuration();
                 if (Tcur > Tmax)
                 {
+                    if (Tmax && Tmin < 0) {
+                        Tmin = Tmax;
+                    }
                     Tmax = Tcur;
                 }
                 else if (Tmin < 0 || Tcur < Tmin)
@@ -106,7 +70,6 @@ public:
             } else {
                 Tmin = 0;
             }
-            
         }
         if (Tmin < 0)
         {
@@ -177,8 +140,16 @@ public:
                 newSol[ii].push_back(allJobs[sol[ii][jj]->getNum()]);
             }
         }
-
-        return new solution(procNum, newSol);
+        solution * res = new solution(procNum, newSol);
+        /*for (size_t i = 0; i < newSol.size(); i++) {
+            for (size_t j = 0; j < newSol[i].size(); j++) {
+                if (newSol[i][j] != nullptr) {
+                    delete newSol[i][j]; 
+                }
+            }
+        }*/ 
+        //std::vector<std::vector<oneJob *>>().swap(newSol);
+        return res;
     }
 
     int getProcNum()
@@ -231,6 +202,55 @@ public:
         return j;
     }
 
+    void check(){
+
+        std::multimap<int, oneJob *> allJobs_map;
+        
+        for (size_t i = 0; i < sol.size(); i++)
+        {
+            for (size_t j = 0; j < sol[i].size(); j++)
+            {
+                allJobs_map.insert({sol[i][j]->getNum(), sol[i][j]});
+            }
+        }
+        //std::cout << allJobs_map.size() << std::endl;
+        std::vector<oneJob *> allJobs;
+
+        for (std::multimap<int, oneJob *>::iterator it = allJobs_map.begin(); it != allJobs_map.end(); ++it) {
+            allJobs.push_back(it->second);
+        }
+        
+
+        for (size_t i = 0; i < sol.size(); i++) {
+            for (size_t j = 0; j < sol[i].size(); j++) {
+        //        std::cout << "i = " << i << " j = " << j << std::endl;
+        //        std::cout << sol[i][j]->getNum() << std::endl;
+                allJobs[sol[i][j]->getNum()]->proc = i;
+            }
+        }
+
+        for (size_t i = 0; i < allJobs.size() - 1; i++)
+        {
+            for (size_t j = 0; j < allJobs.size() - 1 - i; j++)
+            {
+                if (compare(allJobs[j], allJobs[j + 1])){
+                    oneJob * job = allJobs[j + 1];
+                    allJobs.erase(allJobs.begin() + j + 1);
+                    allJobs.insert(allJobs.begin() + j, job);
+                }
+            }
+        }
+        
+        for (size_t i = 0; i < allJobs.size(); i++) {
+            int mainStart = 0;    
+            for (size_t j = 0; j < sol[allJobs[i]->proc].size(); j++) {
+                sol[allJobs[i]->proc][j]->setTStart(std::max(mainStart, sol[allJobs[i]->proc][j]->getLastTStart()));
+                mainStart = sol[allJobs[i]->proc][j]->getTStart() + sol[allJobs[i]->proc][j]->getDuration();
+                
+            }
+        }
+    }
+
     void update(size_t numOfProc, std::multimap <int, oneJob *> allJobs)
     {
         
@@ -248,6 +268,7 @@ public:
                 lastTime = sol[i][j]->getTStart() + sol[i][j]->getDuration();
             }
         }
+        this->check();
         return;
     }
 
@@ -261,7 +282,12 @@ public:
             }
             return;
         }
-        std::multimap<int, oneJob *> allJobs;
+        if (numOfjob == sol[numOfProc].size()) {
+            sol[numOfProc].push_back(j);    
+        } else {
+            sol[numOfProc].insert(sol[numOfProc].begin() + numOfjob, j);    
+        }
+        /*std::multimap<int, oneJob *> allJobs;
         
         for (size_t i = 0; i < sol.size(); i++)
         {
@@ -282,6 +308,8 @@ public:
             last = sol[numOfProc][i]->getTStart() + sol[numOfProc][i]->getDuration();   
         }
         this->update(numOfProc, allJobs);
+        */
+        this->check();
         return;
     }
 

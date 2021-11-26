@@ -16,7 +16,7 @@ private:
 	solution* curSol, *bestSol;
 	temperature* temp;
 	mutation* curMutation;
-	int globOutMaxIter = 1, globInMaxIter = 1;
+	int globOutMaxIter = 10, globInMaxIter = 10;
 	double bestCriterion, curCriterion;
  	int step;
 
@@ -34,10 +34,10 @@ public:
 	} 
 	
 	~mainAlgorithm() {
-		delete(curSol);
-		delete(bestSol);
-		delete(temp);
-		delete(curMutation);
+		delete curSol;
+		delete bestSol;
+		delete temp;
+		delete curMutation;
 	}
 
 	solution* mainCycle (std::string filename = "currentSolution.txt")

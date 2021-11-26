@@ -17,7 +17,8 @@
 
 int main(int argc, char * argv[])
 {
-    /*int mod;
+    
+    int mod;
     std::cout << "0 - Generate data, 1 - Algorithm launch, 2 - Schedule analysis:" << std::endl;
     std::cin >> mod;
 
@@ -76,13 +77,15 @@ int main(int argc, char * argv[])
         
         std::cout << "Print outputFile:" << std::endl; 
         std::cin >> outFilename;
-
+        
         std::vector<oneJob *> allJobs = parser(inFilename);
+        
         parseJobs * parser = new parseJobs();
-        solution * sol = parser->initSol(allJobs, procNum);
+        solution * sol = parser->initSolution(allJobs, procNum);
         temperature *t = new temperature(initTemp);
         mutation * mut = new mutation();
 
+        
         std::cout << "0 - Parallel Algorithm, 1 - Sequential Algorithm:" << std::endl;
         std::cin >> mod;
         solution * res;
@@ -96,7 +99,19 @@ int main(int argc, char * argv[])
             auto end_time_paral = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> worktime = end_time_paral - start_time_paral;
             std::cout << worktime.count() / 1000 << std::endl;
-
+            res->printRESULTNumFile(outFilename);
+            
+            int disbalance = res->getCriterion();
+            int duration = res->duration(); 
+            int idling = res->idle();
+            res->print();
+            std::cout << std::endl;    
+            res->printNum();
+            std::cout << std::endl;    
+            std::cout << "Solution characteristics:" << std::endl;
+            std::cout << "Duration : " << duration << std::endl;
+            std::cout << "Disbalance : " << disbalance << std::endl;
+            std::cout << "Idle time : " << idling << std::endl;
         } else {
             std::cout << "Print steps for intermediate solution print or -1:" << std::endl; 
             std::cin >> stepsForPrint;
@@ -115,21 +130,29 @@ int main(int argc, char * argv[])
             auto end_time_alg = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> worktime = end_time_alg - start_time_alg;
             std::cout << worktime.count() / 1000 << std::endl;
-    
+            res->printRESULTNumFile(outFilename);
+            
+            int disbalance = res->getCriterion();
+            int duration = res->duration(); 
+            int idling = res->idle();
+            res->print();
+            std::cout << std::endl;    
+            res->printNum();
+            std::cout << std::endl;    
+            std::cout << "Solution characteristics:" << std::endl;
+            std::cout << "Duration : " << duration << std::endl;
+            std::cout << "Disbalance : " << disbalance << std::endl;
+            std::cout << "Idle time : " << idling << std::endl;
         }
-
-        
-        //res->print();
-        res->printRESULTNumFile(outFilename);
     } else if (mod == 2) {
         std::string fileWithSchedule, fileWithJobs;
         std::cout << "Print Schedule filename :" << std::endl; 
         std::cin >> fileWithSchedule;
         std::cout << "Print input filename :" << std::endl; 
         std::cin >> fileWithJobs;
-        scheduleCharact(fileWithSchedule, fileWithSchedule);
-    }*/
-    
+        scheduleCharact(fileWithSchedule, fileWithJobs);
+    }
+    /*
     int mod = std::atoi(argv[1]);
     if (!mod) {
         int vertexNum = std::atoi(argv[2]);
@@ -161,7 +184,7 @@ int main(int argc, char * argv[])
         outFilename = argv[5];
         std::vector<oneJob *> allJobs = parser(inFilename);
         parseJobs * parser = new parseJobs();
-        solution * sol = parser->initSol(allJobs, procNum);
+        solution * sol = parser->initSolution(allJobs, procNum);
         temperature *t = new temperature(initTemp);
         mutation * mut = new mutation();
         
@@ -201,7 +224,7 @@ int main(int argc, char * argv[])
         std::string fileWithSchedule, fileWithJobs;
         fileWithSchedule = argv[2];
         fileWithJobs = argv[3];
-        scheduleCharact(fileWithSchedule, fileWithSchedule);
-    }
+        scheduleCharact(fileWithSchedule, fileWithJobs);
+    }*/
     return 0;
 }
