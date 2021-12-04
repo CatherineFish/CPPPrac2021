@@ -17,7 +17,8 @@ public:
 	template <class TCurrentGraph>
 	class TCreator : public ICreator {
 		std::unique_ptr<TGraph> Create(std::unique_ptr<TOptions> &&opts) const override{
-			auto CurrenOptions = dynamic_cast<typename TCurrentGraph::TOpt*>(opts.get());
+			//try here
+            auto CurrenOptions = dynamic_cast<typename TCurrentGraph::TOpt*>(opts.get());
             opts.release();
             if (!CurrenOptions || !CurrenOptions->IsValid())
             {
@@ -45,7 +46,7 @@ public:
     std::unique_ptr<TGraph> CreateGraph(const std::string& type std::unique_ptr<TOptions> &&opts) const {
         auto creator = RegisteredCreators.find(t);
         if (creator == RegisteredCreators.end()) {
-            return nullptr;
+            throw std::invalid_argument();
         }
         return creator->second->Create(std::move(opts));
     }
