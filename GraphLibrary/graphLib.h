@@ -12,7 +12,13 @@ class TBipartiteOptions : public TOptions {
 public:
 
     TBipartiteOptions(std::vector<char> first, std::vector<char> second): firstGroupOfVertex(first), secondGroupOfVertex(second) {}
-    
+    std::vector<char> getFirst() {
+        return firstGroupOfVertex;
+    }
+
+    std::vector<char> getSecond() {
+        return secondGroupOfVertex;
+    }
 private:
     std::vector<char> firstGroupOfVertex;
     std::vector<char> secondGroupOfVertex;  
@@ -22,7 +28,9 @@ class TCompleteOptions : public TOptions {
     
 public:
     TCompleteOptions(std::vector<char> vertex_): vertex(vertex_) {}
-    
+    std::vector<char> getVertex() {
+        return vertex;
+    }
 private:
     std::vector<char> vertex;
 
@@ -41,6 +49,10 @@ public:
         }
         std::sort(vertex.begin(), vertex.end());
         vertex.erase(std::unique(vertex.begin(), vertex.end()), vertex.end());
+    }
+
+    std::vector<std::pair<char, char>> GetEdges() {
+        return edges;
     }
 
 private:
@@ -62,6 +74,10 @@ public:
         std::sort(vertex.begin(), vertex.end());
         vertex.erase(std::unique(vertex.begin(), vertex.end()), vertex.end());
     
+    }
+
+    std::vector<std::pair<std::pair<char, char>, int>> getEdgesWithWeights() {
+        return edgesWithWeights;
     }
     
 private:
