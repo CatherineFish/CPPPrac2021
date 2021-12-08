@@ -9,7 +9,7 @@ public:
 
 	TFactory();
 	~TFactory();
-	std::unique_ptr<TGraph> CreateGraph(
+	std::unique_ptr<TGraph> Create(
 		const std::string& type,
 		std::unique_ptr<TOptions>&& opts) const;
 	std::vector<std::string> GetAvailableGraphs() const;

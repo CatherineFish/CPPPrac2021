@@ -20,9 +20,10 @@ public:
 			//try here
             auto CurrenOptions = dynamic_cast<typename TCurrentGraph::TOpt*>(opts.get());
             opts.release();
-            if (!CurrenOptions || !CurrenOptions->IsValid())
+            //if (!CurrenOptions || !CurrenOptions->IsValid())
+            if (!CurrenOptions)
             {
-                throw std::invalid_argument();
+                throw std::invalid_argument("bad arguments");
             }
             return std::make_unique<TCurrentGraph>(std::unique_ptr<typename TCurrentGraph::TOpt>(CurrenOptions));
 		}
@@ -43,10 +44,10 @@ public:
         RegisterCreator<TWeightedGraph>("weighted");    
     }
 
-    std::unique_ptr<TGraph> CreateGraph(const std::string& type std::unique_ptr<TOptions> &&opts) const {
-        auto creator = RegisteredCreators.find(t);
+    std::unique_ptr<TGraph> Create(const std::string& type, std::unique_ptr<TOptions> &&opts) const {
+        auto creator = RegisteredCreators.find(type);
         if (creator == RegisteredCreators.end()) {
-            throw std::invalid_argument();
+            throw std::invalid_argument("bad arguments");
         }
         return creator->second->Create(std::move(opts));
     }
@@ -61,8 +62,8 @@ public:
 };
 
 
-std::unique_ptr<TGraph> TFactory::CreateGraph(const std::string& type std::unique_ptr<TOptions> &&opts) const {
-    return Impl->CreateGraph(type std::move(opts));
+std::unique_ptr<TGraph> TFactory::Create(const std::string& type, std::unique_ptr<TOptions> &&opts) const {
+    return Impl->Create(type, std::move(opts));
 }
 
 TFactory::TFactory() : Impl(std::make_unique<TFactory::TImpl>()) {}
