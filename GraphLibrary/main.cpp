@@ -21,13 +21,41 @@ int main() {
 	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(first, second));
 	std::cout << bipartite->ToString() << std::endl;
 	// BipartiteGraph {{A, B, C, D}, {E, F}}
+
+	auto bVertex = bipartite->GetVertices();
+	for (auto elem: bVertex) {
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;
+
 	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
 	std::cout << complete->ToString() << std::endl;
 	// CompleteGraph {A, B, F}
+
+	auto cVertex = complete->GetVertices();
+	for (auto elem: cVertex) {
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;	
+
 	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
 	std::cout << simple->ToString() << std::endl;
 	//// SimpleGraph {EF, FA}
+	
+	auto sVertex = simple->GetVertices();
+	for (auto elem: sVertex) {
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;
+
 	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
 	std::cout << weighted->ToString() << std::endl;
 	//WeightedGraph {FD:5, ED:6}
+
+	auto wVertex = weighted->GetVertices();
+	for (auto elem: wVertex) {
+		std::cout << elem << " ";
+	}
+	std::cout << std::endl;
+
 }

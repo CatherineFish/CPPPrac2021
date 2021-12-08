@@ -21,6 +21,14 @@ public:
     std::vector<char> getSecond() {
         return secondGroupOfVertex;
     }
+
+    std::vector<char> getVertex() {
+        std::vector <char> result = firstGroupOfVertex;
+        for (auto&i : secondGroupOfVertex) {
+            result.push_back(i);
+        }
+        return result;
+    }
 private:
     std::vector<char> firstGroupOfVertex;
     std::vector<char> secondGroupOfVertex;  
@@ -32,9 +40,13 @@ public:
     virtual ~TCompleteOptions() override = default;
     
     TCompleteOptions(std::vector<char> vertex_): vertex(vertex_) {}
+    
     std::vector<char> getVertex() {
         return vertex;
     }
+
+
+
 private:
     std::vector<char> vertex;
 
@@ -58,6 +70,10 @@ public:
 
     std::vector<std::pair<char, char>> getEdges() {
         return edges;
+    }
+
+    std::vector<char> getVertex() {
+        return vertex;
     }
 
 private:
@@ -86,6 +102,10 @@ public:
     std::vector<std::pair<std::pair<char, char>, int>> getEdgesWithWeights() {
         return edgesWithWeights;
     }
+
+    std::vector<char> getVertex () {
+        return vertex;
+    }
     
 private:
     std::vector<char> vertex;
@@ -97,7 +117,7 @@ class TWeightedGraph;
 class TGraph {
 public:
     virtual const std::string ToString() const = 0;
-    //virtual const std::vector<char> GetVertices() const = 0;
+    virtual const std::vector<char> GetVertices() const = 0;
     //virtual const std::vector<std::vector<char>> GetEdges() const = 0;
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const = 0;
 
@@ -106,7 +126,9 @@ public:
 class TWeightedGraph : public TGraph{
 public:
     using TOpt = TWeightedOptions;
+    
     TWeightedGraph(std::unique_ptr<TOpt> initParams_) : vertexAndWeightedEdges(std::move(initParams_)){}
+    
     virtual const std::string ToString() const override {
         std::string result =  "WeightedGraph {";
         bool start = true;
@@ -123,7 +145,10 @@ public:
         result += "}";
         return result;
     }
-    //virtual const std::vector<char> GetVertices() const override;
+
+    virtual const std::vector<char> GetVertices() const override {
+        return vertexAndWeightedEdges->getVertex();
+    }
     //virtual const std::vector<std::vector<char>> GetEdges() const override;
     
 private:
@@ -134,7 +159,9 @@ private:
 class TBipartiteGraph : public TGraph {
 public:
     using TOpt = TBipartiteOptions; 
+    
     TBipartiteGraph(std::unique_ptr<TOpt> initParams_) : vertexVectors(std::move(initParams_)) {}
+    
     virtual const std::string ToString() const override {
         std::string result = "BipartiteGraph {{";
         bool start = true;
@@ -158,7 +185,10 @@ public:
         return result;
     
     }
-    //virtual const std::vector<char> GetVertices() const override;
+
+    virtual const std::vector<char> GetVertices() const override {
+        return vertexVectors->getVertex();
+    }
     //virtual const std::vector<std::vector<char>> GetEdges() const override{}
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
@@ -168,7 +198,9 @@ private:
 class TCompleteGraph : public TGraph{
 public:
     using TOpt = TCompleteOptions;
+    
     TCompleteGraph(std::unique_ptr<TOpt> vertex_) : vertex(std::move(vertex_)) {}
+    
     virtual const std::string ToString() const override{
         std::string result = "CompleteGraph {";
         bool start = true;
@@ -182,7 +214,10 @@ public:
         result += "}";
         return result;
     }
-    //virtual const std::vector<char> GetVertices() const override;
+    
+    virtual const std::vector<char> GetVertices() const override{
+        return vertex->getVertex();
+    }
     //virtual const std::vector<std::vector<char>> GetEdges() const override{}
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
@@ -192,7 +227,9 @@ private:
 class TSimpleGraph : public TGraph{
 public:
     using TOpt = TSimpleOptions;
+    
     TSimpleGraph(std::unique_ptr<TOpt> edges_) : edges(std::move(edges_)) {}
+    
     virtual const std::string ToString() const override{
         std::string result = "SimpleGraph {";
         bool start = true;
@@ -207,7 +244,10 @@ public:
         result += "}";
         return result;
     }
-    //virtual const std::vector<char> GetVertices() const override;
+    
+    virtual const std::vector<char> GetVertices() const override {
+        return edges->getVertex();
+    }
     //virtual const std::vector<std::vector<char>> GetEdges() const override{}
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
