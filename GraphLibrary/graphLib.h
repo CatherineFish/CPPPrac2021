@@ -29,6 +29,17 @@ public:
         }
         return result;
     }
+
+    std::vector<std::pair<char, char>> getEdges() {
+        std::vector<std::pair<char, char>> result;
+        for (const auto &first: firstGroupOfVertex) {
+            for (const auto& second: secondGroupOfVertex) {
+                result.push_back({first, second});
+            }
+        }
+        return result;
+    }
+
 private:
     std::vector<char> firstGroupOfVertex;
     std::vector<char> secondGroupOfVertex;  
@@ -45,6 +56,15 @@ public:
         return vertex;
     }
 
+    std::vector<std::pair<char, char>> getEdges() {
+        std::vector<std::pair<char, char>> result;
+        for (size_t i = 0; i < vertex.size(); i++) {
+            for (size_t j = i + 1; j < vertex.size(); j++) {
+                result.push_back({vertex[i], vertex[j]});
+            }
+        }
+        return result;
+    }
 
 
 private:
@@ -106,6 +126,14 @@ public:
     std::vector<char> getVertex () {
         return vertex;
     }
+
+    std::vector<std::pair<char, char>> getEdges() {
+        std::vector<std::pair<char, char>> result;
+        for (const auto &i:edgesWithWeights) {
+            result.push_back(i.first);
+        }
+        return result;
+    }
     
 private:
     std::vector<char> vertex;
@@ -118,7 +146,7 @@ class TGraph {
 public:
     virtual const std::string ToString() const = 0;
     virtual const std::vector<char> GetVertices() const = 0;
-    //virtual const std::vector<std::vector<char>> GetEdges() const = 0;
+    virtual const std::vector<std::pair<char, char>> GetEdges() const = 0;
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const = 0;
 
 };
@@ -149,7 +177,10 @@ public:
     virtual const std::vector<char> GetVertices() const override {
         return vertexAndWeightedEdges->getVertex();
     }
-    //virtual const std::vector<std::vector<char>> GetEdges() const override;
+    
+    virtual const std::vector<std::pair<char, char>> GetEdges() const override {
+        return vertexAndWeightedEdges->getEdges();
+    }
     
 private:
     std::unique_ptr<TOpt> vertexAndWeightedEdges;
@@ -189,7 +220,11 @@ public:
     virtual const std::vector<char> GetVertices() const override {
         return vertexVectors->getVertex();
     }
-    //virtual const std::vector<std::vector<char>> GetEdges() const override{}
+    
+    virtual const std::vector<std::pair<char, char>> GetEdges() const override {
+        return vertexVectors->getEdges();
+    }
+    
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
     std::unique_ptr<TOpt> vertexVectors;
@@ -218,7 +253,11 @@ public:
     virtual const std::vector<char> GetVertices() const override{
         return vertex->getVertex();
     }
-    //virtual const std::vector<std::vector<char>> GetEdges() const override{}
+
+    virtual const std::vector<std::pair<char, char>> GetEdges() const override{
+        return vertex->getEdges();
+    }
+    
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
     std::unique_ptr<TOpt> vertex;
@@ -248,7 +287,11 @@ public:
     virtual const std::vector<char> GetVertices() const override {
         return edges->getVertex();
     }
-    //virtual const std::vector<std::vector<char>> GetEdges() const override{}
+
+    virtual const std::vector<std::pair<char, char>> GetEdges() const override{
+        return edges->getEdges();
+    }
+    
     //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
 private:
     std::unique_ptr<TOpt> edges;

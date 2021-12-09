@@ -28,6 +28,13 @@ int main() {
 	}
 	std::cout << std::endl;
 
+	auto bEdges = bipartite->GetEdges();
+	for (auto elem: bEdges) {
+		std::cout << elem.first << elem.second << " ";
+	}
+	std::cout << std::endl;
+
+	
 	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
 	std::cout << complete->ToString() << std::endl;
 	// CompleteGraph {A, B, F}
@@ -37,6 +44,14 @@ int main() {
 		std::cout << elem << " ";
 	}
 	std::cout << std::endl;	
+
+	auto cEdges = complete->GetEdges();
+	for (auto elem: cEdges) {
+		std::cout << elem.first << elem.second << " ";
+	}
+	std::cout << std::endl;
+
+
 
 	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
 	std::cout << simple->ToString() << std::endl;
@@ -48,6 +63,14 @@ int main() {
 	}
 	std::cout << std::endl;
 
+	auto sEdges = simple->GetEdges();
+	for (auto elem: sEdges) {
+		std::cout << elem.first << elem.second << " ";
+	}
+	std::cout << std::endl;
+
+
+
 	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
 	std::cout << weighted->ToString() << std::endl;
 	//WeightedGraph {FD:5, ED:6}
@@ -57,5 +80,12 @@ int main() {
 		std::cout << elem << " ";
 	}
 	std::cout << std::endl;
+
+	auto wEdges = weighted->GetEdges();
+	for (auto elem: wEdges) {
+		std::cout << elem.first << elem.second << " ";
+	}
+	std::cout << std::endl;
+
 
 }
