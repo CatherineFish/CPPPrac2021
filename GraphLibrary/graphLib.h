@@ -96,6 +96,8 @@ public:
         return vertex;
     }
 
+
+
 private:
     std::vector<char> vertex;
     std::vector<std::pair<char, char>> edges;
@@ -147,7 +149,7 @@ public:
     virtual const std::string ToString() const = 0;
     virtual const std::vector<char> GetVertices() const = 0;
     virtual const std::vector<std::pair<char, char>> GetEdges() const = 0;
-    //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const = 0;
+    virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const = 0;
 
 };
 
@@ -181,6 +183,17 @@ public:
     virtual const std::vector<std::pair<char, char>> GetEdges() const override {
         return vertexAndWeightedEdges->getEdges();
     }
+
+    virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override{
+        std::vector<std::pair<char, char>> oldEdges = vertexAndWeightedEdges->getEdges();
+        std::vector<std::string> newEdges; 
+        std::vector<int> weights(oldEdges.size(), defaultWeights);
+        for (const auto &i: oldEdges) {
+            newEdges.push_back(std::string() + i.first + i.second);
+        }
+        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
+    }
+
     
 private:
     std::unique_ptr<TOpt> vertexAndWeightedEdges;
@@ -225,7 +238,16 @@ public:
         return vertexVectors->getEdges();
     }
     
-    //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
+    virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override{
+        std::vector<std::pair<char, char>> oldEdges = vertexVectors->getEdges();
+        std::vector<std::string> newEdges; 
+        std::vector<int> weights(oldEdges.size(), defaultWeights);
+        for (const auto &i: oldEdges) {
+            newEdges.push_back(std::string() + i.first + i.second);
+        }
+        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
+    }
+
 private:
     std::unique_ptr<TOpt> vertexVectors;
 };
@@ -258,7 +280,15 @@ public:
         return vertex->getEdges();
     }
     
-    //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
+    virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override{
+        std::vector<std::pair<char, char>> oldEdges = vertex->getEdges();
+        std::vector<std::string> newEdges; 
+        std::vector<int> weights(oldEdges.size(), defaultWeights);
+        for (const auto &i: oldEdges) {
+            newEdges.push_back(std::string() + i.first + i.second);
+        }
+        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
+    }
 private:
     std::unique_ptr<TOpt> vertex;
 };
@@ -292,7 +322,15 @@ public:
         return edges->getEdges();
     }
     
-    //virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override;
+    virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override{
+        std::vector<std::pair<char, char>> oldEdges = edges->getEdges();
+        std::vector<std::string> newEdges; 
+        std::vector<int> weights(oldEdges.size(), defaultWeights);
+        for (const auto &i: oldEdges) {
+            newEdges.push_back(std::string() + i.first + i.second);
+        }
+        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
+    }
 private:
     std::unique_ptr<TOpt> edges;
     

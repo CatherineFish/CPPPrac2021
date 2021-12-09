@@ -22,6 +22,7 @@ int main() {
 	std::cout << bipartite->ToString() << std::endl;
 	// BipartiteGraph {{A, B, C, D}, {E, F}}
 
+
 	auto bVertex = bipartite->GetVertices();
 	for (auto elem: bVertex) {
 		std::cout << elem << " ";
@@ -33,6 +34,12 @@ int main() {
 		std::cout << elem.first << elem.second << " ";
 	}
 	std::cout << std::endl;
+
+	auto Bweighted = bipartite->AsWeighted(5);
+
+	std::cout << Bweighted->ToString() << std::endl;
+
+
 
 	
 	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
@@ -50,6 +57,11 @@ int main() {
 		std::cout << elem.first << elem.second << " ";
 	}
 	std::cout << std::endl;
+
+
+	auto Cweighted = complete->AsWeighted(5);
+
+	std::cout << Cweighted->ToString() << std::endl;
 
 
 
@@ -70,6 +82,11 @@ int main() {
 	std::cout << std::endl;
 
 
+	auto Sweighted = simple->AsWeighted(5);
+
+	std::cout << Sweighted->ToString() << std::endl;
+
+
 
 	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
 	std::cout << weighted->ToString() << std::endl;
@@ -86,6 +103,10 @@ int main() {
 		std::cout << elem.first << elem.second << " ";
 	}
 	std::cout << std::endl;
+
+	auto Wweighted = weighted->AsWeighted(5);
+
+	std::cout << Wweighted->ToString() << std::endl;
 
 
 }
