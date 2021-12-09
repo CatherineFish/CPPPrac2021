@@ -64,3 +64,18 @@ std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TWeighted
 }
 
 
+std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TGraph &secondGraph) {
+	throw std::invalid_argument("bad arguments");
+}
+
+std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TWeightedGraph &secondGraph) {
+	throw std::invalid_argument("bad arguments");
+}
+
+std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TWeightedGraph &secondGraph) {
+	throw std::invalid_argument("bad arguments");
+}
+
+std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TWeightedGraph &secondGraph) {
+	throw std::invalid_argument("bad arguments");	
+}

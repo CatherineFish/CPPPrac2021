@@ -187,14 +187,18 @@ public:
     virtual std::unique_ptr<TWeightedGraph> AsWeighted(int defaultWeights) const override{
         std::vector<std::pair<char, char>> oldEdges = vertexAndWeightedEdges->getEdges();
         std::vector<std::string> newEdges; 
-        std::vector<int> weights(oldEdges.size(), defaultWeights);
+        std::vector<int> newWeights;
+        for (const auto& i: vertexAndWeightedEdges->getEdgesWithWeights()) {
+            newWeights.push_back(i.second);
+        }
         for (const auto &i: oldEdges) {
             newEdges.push_back(std::string() + i.first + i.second);
         }
-        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
+        return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, newWeights));
     }
 
     friend std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TGraph &secondGraph);
     
 private:
     std::unique_ptr<TOpt> vertexAndWeightedEdges;
@@ -250,7 +254,8 @@ public:
     }
 
     friend std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TBipartiteGraph &secondGraph);
-
+    friend std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TWeightedGraph &secondGraph);
+    
 private:
     std::unique_ptr<TOpt> vertexVectors;
 };
@@ -294,7 +299,8 @@ public:
     }
 
     friend std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TCompleteGraph &secondGraph);
-
+    friend std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TWeightedGraph &secondGraph);
+    
 
 
 private:
@@ -339,6 +345,9 @@ public:
         }
         return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
     }
+
+    friend std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TWeightedGraph &secondGraph);
+    
 private:
     std::unique_ptr<TOpt> edges;
     
