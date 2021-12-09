@@ -40,6 +40,15 @@ int main() {
 	std::cout << Bweighted->ToString() << std::endl;
 
 
+	std::vector<char> first_2 = {'G', 'H', 'M'};
+	std::vector<char> second_2 = {'K', 'L', 'Z'};
+
+	std::cout << "SUM\n";
+
+	auto bipartite_2 = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(first_2, second_2));
+	auto bipartite_sum = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TBipartiteGraph*>(bipartite_2.get()));
+	std::cout << bipartite_sum->ToString() << std::endl;
+	
 
 	
 	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
@@ -62,6 +71,14 @@ int main() {
 	auto Cweighted = complete->AsWeighted(5);
 
 	std::cout << Cweighted->ToString() << std::endl;
+
+	std::vector<char> completeParam_2 = {'C', 'D'};
+
+	std::cout << "SUM\n";
+
+	auto complete_2 = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam_2));
+	auto complete_sum = *(dynamic_cast<TCompleteGraph*>(complete.get())) + *(dynamic_cast<TCompleteGraph*>(complete_2.get()));
+	std::cout << complete_sum->ToString() << std::endl;
 
 
 
@@ -107,6 +124,17 @@ int main() {
 	auto Wweighted = weighted->AsWeighted(5);
 
 	std::cout << Wweighted->ToString() << std::endl;
+
+
+	std::vector<std::string> weightedParamEdges_2 = {{"FD"}, {"ED"}, {"MP"}};
+	std::vector<int> weightedParamW_2 = {3, 6, 7};
+	std::cout << "SUM\n";
+
+	auto weighted_2 = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges_2, weightedParamW_2));
+	
+	auto weighted_sum = *(dynamic_cast<TWeightedGraph*>(weighted.get())) + *(dynamic_cast<TWeightedGraph*>(weighted_2.get()));
+	std::cout << weighted_sum->ToString() << std::endl;
+
 
 
 }

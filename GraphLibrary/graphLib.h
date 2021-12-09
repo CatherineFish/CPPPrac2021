@@ -194,6 +194,7 @@ public:
         return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
     }
 
+    friend std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TWeightedGraph &secondGraph);
     
 private:
     std::unique_ptr<TOpt> vertexAndWeightedEdges;
@@ -248,6 +249,8 @@ public:
         return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
     }
 
+    friend std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TBipartiteGraph &secondGraph);
+
 private:
     std::unique_ptr<TOpt> vertexVectors;
 };
@@ -289,6 +292,11 @@ public:
         }
         return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, weights));
     }
+
+    friend std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TCompleteGraph &secondGraph);
+
+
+
 private:
     std::unique_ptr<TOpt> vertex;
 };
