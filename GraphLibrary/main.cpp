@@ -2,6 +2,8 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include "factory.h"
+#include "findFunction.h"
+
 
 TEST(GraphsCreation, noExceptionTest)
 {
@@ -219,6 +221,24 @@ TEST(GraphsMethods, AsWeighted)
     std::string actualW = weighted_2->ToString();
     std::string Wexpected = expectedW.str();
     EXPECT_EQ(Wexpected, actualW);
+}
+
+TEST(TWeightedGraph, findFunction)
+{
+    TFactory factory;
+
+    std::vector<std::string> weightedParamEdges = {{"AB"}, {"AC"}, {"AF"}, {"BC"}, {"CF"}};
+    std::vector<int> weightedParamW = {1, 5, 3, 4, 1};
+    
+    auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+    std::vector<std::pair<char, char>> expectedW {{'B', 'A'}, {'A', 'F'}};
+    ASSERT_EQ (expectedW, findFunction(*(dynamic_cast<TWeightedGraph*>(weighted.get())), 'B', 'F'));
+
+    std::vector<std::string> weightedParamEdges_2 = {{"AB"}, {"AC"}, {"BC"}, {"MK"}, {"KL"}, {"LN"}};
+    std::vector<int> weightedParamW_2 = {20, 30, 4, 5, 1, 2};
+    auto weighted_2 = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges_2, weightedParamW_2));
+    
+    ASSERT_THROW(findFunction(*(dynamic_cast<TWeightedGraph*>(weighted_2.get())), 'A', 'N'), std::logic_error);
 }
 
 TEST(GraphsOperators, SumWithBipartite)
