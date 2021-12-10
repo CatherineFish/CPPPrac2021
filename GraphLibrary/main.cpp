@@ -173,7 +173,53 @@ TEST(GraphsMethods, GetEdges)
 	
 }
 
+TEST(GraphsMethods, AsWeighted)
+{
+	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	auto bipartite_2 = bipartite->AsWeighted(5);
+	std::ostringstream expectedB;
+    expectedB << "WeightedGraph {AE:5, AF:5, BE:5, BF:5, CE:5, CF:5, DE:5, DF:5}";
+    std::string actualB = bipartite_2->ToString();
+    std::string Bexpected = expectedB.str();
+    EXPECT_EQ(Bexpected, actualB);
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'A', 'B', 'F'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	std::ostringstream expectedC;
+    auto complete_2 = complete->AsWeighted(5);
+    expectedC << "WeightedGraph {AB:5, AF:5, BF:5}";
+    std::string actualC = complete_2->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);
 
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	std::ostringstream expectedS;
+    auto simple_2 = simple->AsWeighted(5);
+    expectedS << "WeightedGraph {AF:5, EF:5}";
+    std::string actualS = simple_2->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	auto weighted_2 = weighted->AsWeighted(3);
+	std::ostringstream expectedW;
+    expectedW << "WeightedGraph {DE:6, DF:5}";
+    std::string actualW = weighted_2->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);
+}
 
 int main(int argc, char * argv[]) {
 
