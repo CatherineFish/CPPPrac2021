@@ -55,6 +55,51 @@ TEST(GraphsCreation, ExceptionTest)
 	ASSERT_THROW(factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond)), std::invalid_argument);
 }
 
+TEST(GraphsMethods, toString)
+{
+	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	std::ostringstream expectedB;
+    expectedB << "BipartiteGraph {{A, B, C, D}, {E, F}}";
+    std::string actualB = bipartite->ToString();
+    std::string Bexpected = expectedB.str();
+    EXPECT_EQ(Bexpected, actualB);
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'A', 'B', 'F'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	std::ostringstream expectedC;
+    expectedC << "CompleteGraph {A, B, F}";
+    std::string actualC = complete->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);
+
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {EF, FA}";
+    std::string actualS = simple->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	std::ostringstream expectedW;
+    expectedW << "WeightedGraph {FD:5, ED:6}";
+    std::string actualW = weighted->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);
+}
+
+
 
 int main(int argc, char * argv[]) {
 
