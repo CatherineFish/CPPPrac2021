@@ -190,6 +190,7 @@ std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TWeighted
 		newWeights.push_back(i.second);
 	}
 
+
 	std::vector<std::string> secondNewEdges;
 	std::vector<std::pair<char,char>> secondEdges = secondGraph.vertexAndWeightedEdges->getEdges();
 	for (const auto &i: secondEdges) {
@@ -197,12 +198,15 @@ std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TWeighted
     }
 
     for (const auto& elem: secondNewEdges) {
+    	if (elem == "") continue;
     	auto it = find(newEdges.begin(), newEdges.end(), elem);
     	if (it != newEdges.end()) {
-    		int idx_2 = it - secondNewEdges.begin();
-    		remove(newEdges.begin(), newEdges.end(), elem);
+    		int idx_2 = it - newEdges.begin();
+    		newEdges.erase(newEdges.begin() + idx_2);
 			newWeights.erase(newWeights.begin() + idx_2);    		
     	}
+
+
     }
 	return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, newWeights));
 
@@ -341,7 +345,8 @@ std::unique_ptr<TSimpleGraph> operator- (TBipartiteGraph &firstGraph, TWeightedG
 	std::vector<std::string> newEdges;
 	std::vector<std::pair<char,char>> oldEdges = firstGraph.vertexVectors->getEdges();
 	for (const auto &i: oldEdges) {
-            newEdges.push_back(std::string() + i.first + i.second);
+        newEdges.push_back(std::string() + i.first + i.second);
+    		
     }
     
 
@@ -354,7 +359,7 @@ std::unique_ptr<TSimpleGraph> operator- (TBipartiteGraph &firstGraph, TWeightedG
     for (const auto& elem: secondNewEdges) {
     	remove(newEdges.begin(), newEdges.end(), elem);
     }
-	return std::make_unique<TSimpleGraph>(std::make_unique<TSimpleOptions>(newEdges));
+    return std::make_unique<TSimpleGraph>(std::make_unique<TSimpleOptions>(newEdges));
 }
 
 

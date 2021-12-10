@@ -221,144 +221,299 @@ TEST(GraphsMethods, AsWeighted)
     EXPECT_EQ(Wexpected, actualW);
 }
 
-int main(int argc, char * argv[]) {
-
-
-	testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST(GraphsOperators, SumWithBipartite)
+{
+	TFactory factory;
 	
-	/*TFactory factory;
-	auto graphs = factory.GetAvailableGraphs();
-	for (const auto& gen : graphs) {
-		std::cout << gen << std::endl;
-	}
-	std::vector<char> first = {'7','B','C','D'};
-	std::vector<char> second = {'E','F'};
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	
+	std::vector<char> bipartParamFirst_2 = {'M', 'N'};
+	std::vector<char> bipartParamSecond_2 = {'K', 'L'};
+	auto bipartite_2 = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst_2, bipartParamSecond_2));
+	
+	auto bipartite_3 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TBipartiteGraph*>(bipartite_2.get()));
+	
+	std::ostringstream expectedB;
+    expectedB << "BipartiteGraph {{A, B, C, D, M, N}, {E, F, K, L}}";
+    std::string actualB = bipartite_3->ToString();
+    std::string Bexpected = expectedB.str();
+    EXPECT_EQ(Bexpected, actualB);
 
-	std::vector<char> completeParam = {'7', 'B', 'F'};
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'K', 'M'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	
+	auto complete_2 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TCompleteGraph*>(complete.get()));
+	std::ostringstream expectedC;
+    expectedC << "SimpleGraph {AE, AF, BE, BF, CE, CF, DE, DF, KM}";
+    std::string actualC = complete_2->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);	
 
-	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
-
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	auto simple_2 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {AE, AF, BE, BF, CE, CF, DE, DF, EF}";
+    std::string actualS = simple_2->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+	
+	//Weighted Graph
 	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
 	std::vector<int> weightedParamW = {5, 6};
-
-	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(first, second));
-	std::cout << bipartite->ToString() << std::endl;
-	// BipartiteGraph {{A, B, C, D}, {E, F}}
-
-
-	/*auto bVertex = bipartite->GetVertices();
-	for (auto elem: bVertex) {
-		std::cout << elem << " ";
-	}
-	std::cout << std::endl;
-
-	auto bEdges = bipartite->GetEdges();
-	for (auto elem: bEdges) {
-		std::cout << elem.first << elem.second << " ";
-	}
-	std::cout << std::endl;
-
-	auto Bweighted = bipartite->AsWeighted(5);
-
-	std::cout << Bweighted->ToString() << std::endl;
-
-
-	std::vector<char> first_2 = {'G', 'H', 'M'};
-	std::vector<char> second_2 = {'K', 'L', 'Z'};
-
-	std::cout << "SUM\n";
-
-	auto bipartite_2 = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(first_2, second_2));
-	auto bipartite_sum = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TBipartiteGraph*>(bipartite_2.get()));
-	std::cout << bipartite_sum->ToString() << std::endl;
-	*/
-
-	
-	/*auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
-	std::cout << complete->ToString() << std::endl;
-	// CompleteGraph {A, B, F}
-	/*
-	auto cVertex = complete->GetVertices();
-	for (auto elem: cVertex) {
-		std::cout << elem << " ";
-	}
-	std::cout << std::endl;	
-
-	auto cEdges = complete->GetEdges();
-	for (auto elem: cEdges) {
-		std::cout << elem.first << elem.second << " ";
-	}
-	std::cout << std::endl;
-
-
-	auto Cweighted = complete->AsWeighted(5);
-
-	std::cout << Cweighted->ToString() << std::endl;
-
-	std::vector<char> completeParam_2 = {'C', 'D'};
-
-	std::cout << "SUM\n";
-
-	auto complete_2 = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam_2));
-	auto complete_sum = *(dynamic_cast<TCompleteGraph*>(complete.get())) + *(dynamic_cast<TCompleteGraph*>(complete_2.get()));
-	std::cout << complete_sum->ToString() << std::endl;
-
-
-
-	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
-	std::cout << simple->ToString() << std::endl;
-	//// SimpleGraph {EF, FA}
-	
-	auto sVertex = simple->GetVertices();
-	for (auto elem: sVertex) {
-		std::cout << elem << " ";
-	}
-	std::cout << std::endl;
-
-	auto sEdges = simple->GetEdges();
-	for (auto elem: sEdges) {
-		std::cout << elem.first << elem.second << " ";
-	}
-	std::cout << std::endl;
-
-
-	auto Sweighted = simple->AsWeighted(5);
-
-	std::cout << Sweighted->ToString() << std::endl;
-
-
-
 	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
-	std::cout << weighted->ToString() << std::endl;
-	//WeightedGraph {FD:5, ED:6}
+	ASSERT_THROW(*(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TWeightedGraph*>(weighted.get())), std::logic_error);
 
-	auto wVertex = weighted->GetVertices();
-	for (auto elem: wVertex) {
-		std::cout << elem << " ";
-	}
-	std::cout << std::endl;
+}
 
-	auto wEdges = weighted->GetEdges();
-	for (auto elem: wEdges) {
-		std::cout << elem.first << elem.second << " ";
-	}
-	std::cout << std::endl;
+TEST(GraphsOperators, SumWithComplete)
+{
+	TFactory factory;
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'K', 'M'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	
+	std::vector<char> completeParam_2 = {'A', 'B', 'C'};
+	auto complete_2 = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam_2));
+	
 
-	auto Wweighted = weighted->AsWeighted(5);
+	auto complete_3 = *(dynamic_cast<TCompleteGraph*>(complete_2.get())) + *(dynamic_cast<TCompleteGraph*>(complete.get()));
+	std::ostringstream expectedC;
+    expectedC << "CompleteGraph {A, B, C, K, M}";
+    std::string actualC = complete_3->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);	
+	
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	auto simple_2 = *(dynamic_cast<TCompleteGraph*>(complete.get())) + *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {EF, KM}";
+    std::string actualS = simple_2->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	ASSERT_THROW(*(dynamic_cast<TCompleteGraph*>(complete.get())) + *(dynamic_cast<TWeightedGraph*>(weighted.get())), std::logic_error);
 
-	std::cout << Wweighted->ToString() << std::endl;
+}
 
+TEST(GraphsOperators, SumWithSimple)
+{
+	TFactory factory;
+		
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	std::vector<std::string> simpleParam_2 = {{"AB"}, {"CM"}};
+	auto simple_2 = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam_2));
+	
+	auto simple_3 = *(dynamic_cast<TSimpleGraph*>(simple_2.get())) + *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {AB, CM, EF}";
+    std::string actualS = simple_3->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);	
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	ASSERT_THROW(*(dynamic_cast<TSimpleGraph*>(simple.get())) + *(dynamic_cast<TWeightedGraph*>(weighted.get())), std::logic_error);
 
-	std::vector<std::string> weightedParamEdges_2 = {{"FD"}, {"ED"}, {"MP"}};
-	std::vector<int> weightedParamW_2 = {3, 6, 7};
-	std::cout << "SUM\n";
+}
 
+TEST(GraphsOperators, SumWithWeight)
+{
+	TFactory factory;
+
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+
+	std::vector<std::string> weightedParamEdges_2 = {{"FD"}, {"MK"}};
+	std::vector<int> weightedParamW_2 = {3, 6};
 	auto weighted_2 = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges_2, weightedParamW_2));
 	
-	auto weighted_sum = *(dynamic_cast<TWeightedGraph*>(weighted.get())) + *(dynamic_cast<TWeightedGraph*>(weighted_2.get()));
-	std::cout << weighted_sum->ToString() << std::endl;
-	*/
+	auto weighted_3 = *(dynamic_cast<TWeightedGraph*>(weighted_2.get())) + *(dynamic_cast<TWeightedGraph*>(weighted.get()));
+	std::ostringstream expectedW;
+    expectedW << "WeightedGraph {DE:6, DF:3, KM:6}";
+    std::string actualW = weighted_3->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);	
+}
 
+TEST(GraphsOperators, SubWithBipartite)
+{
+	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	
+	std::vector<char> bipartParamFirst_2 = {'M', 'N'};
+	std::vector<char> bipartParamSecond_2 = {'K', 'L'};
+	auto bipartite_2 = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst_2, bipartParamSecond_2));
+	
+	auto bipartite_3 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) - *(dynamic_cast<TBipartiteGraph*>(bipartite_2.get()));
+	
+	std::ostringstream expectedB;
+    expectedB << "BipartiteGraph {{A, B, C, D}, {E, F}}";
+    std::string actualB = bipartite_3->ToString();
+    std::string Bexpected = expectedB.str();
+    EXPECT_EQ(Bexpected, actualB);
+
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'K', 'M'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	
+	auto complete_2 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) - *(dynamic_cast<TCompleteGraph*>(complete.get()));
+	std::ostringstream expectedC;
+    expectedC << "SimpleGraph {AE, AF, BE, BF, CE, CF, DE, DF}";
+    std::string actualC = complete_2->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);	
+
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	auto simple_2 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) - *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {AE, AF, BE, BF, CE, CF, DE, DF}";
+    std::string actualS = simple_2->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	auto weighted_2 = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) - *(dynamic_cast<TWeightedGraph*>(weighted.get()));
+	std::ostringstream expectedW;
+    expectedW << "SimpleGraph {AE, AF, BE, BF, CE, CF}";
+    std::string actualW = weighted_2->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);
+	
+
+}
+
+TEST(GraphsOperators, SubWithComplete)
+{
+	TFactory factory;
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'E', 'F', 'A', 'D'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	
+	std::vector<char> completeParam_2 = {'A', 'B', 'C'};
+	auto complete_2 = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam_2));
+	
+
+	auto complete_3 = *(dynamic_cast<TCompleteGraph*>(complete_2.get())) - *(dynamic_cast<TCompleteGraph*>(complete.get()));
+	std::ostringstream expectedC;
+    expectedC << "CompleteGraph {B, C}";
+    std::string actualC = complete_3->ToString();
+    std::string Cexpected = expectedC.str();
+    EXPECT_EQ(Cexpected, actualC);	
+	
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	auto simple_2 = *(dynamic_cast<TCompleteGraph*>(complete.get())) - *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {AD, AE, AF, DE, DF, EF}";
+    std::string actualS = simple_2->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	
+	auto weighted_2 = *(dynamic_cast<TCompleteGraph*>(complete.get())) - *(dynamic_cast<TWeightedGraph*>(weighted.get()));
+	std::ostringstream expectedW;
+    expectedW << "SimpleGraph {AD, AE, AF, EF}";
+    std::string actualW = weighted_2->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);
+}
+
+
+TEST(GraphsOperators, SubWithSimple)
+{
+	TFactory factory;
+		
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"MC"}, {"DE"}, {"AE"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	
+	std::vector<std::string> simpleParam_2 = {{"AB"}, {"CM"}};
+	auto simple_2 = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam_2));
+	
+	auto simple_3 = *(dynamic_cast<TSimpleGraph*>(simple_2.get())) - *(dynamic_cast<TSimpleGraph*>(simple.get()));
+	std::ostringstream expectedS;
+    expectedS << "SimpleGraph {AB, CM}";
+    std::string actualS = simple_3->ToString();
+    std::string Sexpected = expectedS.str();
+    EXPECT_EQ(Sexpected, actualS);	
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	auto weighted_2 = *(dynamic_cast<TSimpleGraph*>(simple.get())) - *(dynamic_cast<TWeightedGraph*>(weighted.get()));
+	std::ostringstream expectedW;
+    expectedW << "SimpleGraph {AE, CM, EF}";
+    std::string actualW = weighted_2->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);
+}
+
+TEST(GraphsOperators, SubWithWeight)
+{
+	TFactory factory;
+
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+
+	std::vector<std::string> weightedParamEdges_2 = {{"FD"}, {"MK"}};
+	std::vector<int> weightedParamW_2 = {3, 6};
+	auto weighted_2 = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges_2, weightedParamW_2));
+	
+	auto weighted_3 = *(dynamic_cast<TWeightedGraph*>(weighted_2.get())) - *(dynamic_cast<TWeightedGraph*>(weighted.get()));
+	std::ostringstream expectedW;
+    expectedW << "WeightedGraph {KM:6}";
+    std::string actualW = weighted_3->ToString();
+    std::string Wexpected = expectedW.str();
+    EXPECT_EQ(Wexpected, actualW);	
+}
+
+
+int main(int argc, char * argv[]) {
+	testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 
 }

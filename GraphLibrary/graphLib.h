@@ -127,6 +127,7 @@ public:
     TSimpleOptions(std::vector<std::string> edgesPairs)
     {
         for (const auto& i: edgesPairs) {
+            if (i == "") continue;
             if (i.size() != 2) {
                 throw std::invalid_argument("Edge name must be two letters length");
             }
