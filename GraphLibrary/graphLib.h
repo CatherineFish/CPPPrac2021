@@ -13,7 +13,28 @@ class TBipartiteOptions : public TOptions {
     
 public:
     virtual ~TBipartiteOptions() override = default;
-    TBipartiteOptions(std::vector<char> first, std::vector<char> second): firstGroupOfVertex(first), secondGroupOfVertex(second) {}
+    TBipartiteOptions(std::vector<char> first, std::vector<char> second) {
+        for (const auto& i: first) {
+            if ('A' <= i && i <= 'Z') {
+                firstGroupOfVertex.push_back(i);
+            } else {
+                throw std::invalid_argument("Vertex must be uppercase latin letter");
+            }
+        }
+
+        for (const auto& i: second) {
+            auto it = find(firstGroupOfVertex.begin(), firstGroupOfVertex.end(), i);
+            if (it != firstGroupOfVertex.end()) {
+                throw std::invalid_argument("Vertices in two parts must be different");
+            }
+            if ('A' <= i && i <= 'Z') {
+                secondGroupOfVertex.push_back(i);
+            } else {
+                throw std::invalid_argument("Vertex must be uppercase latin letter");
+            }
+        }
+        
+    } 
     std::vector<char> getFirst() {
         return firstGroupOfVertex;
     }
@@ -50,17 +71,25 @@ class TCompleteOptions : public TOptions {
 public:
     virtual ~TCompleteOptions() override = default;
     
-    TCompleteOptions(std::vector<char> vertex_): vertex(vertex_) {}
+    TCompleteOptions(std::vector<char> vertex_) {
+        for (const auto& i: vertex_) {
+            if ('A' <= i && i <= 'Z') {
+                allVertex.push_back(i);
+            } else {
+                throw std::invalid_argument("Vertex must be uppercase latin letter");
+            }
+        }
+    }
     
     std::vector<char> getVertex() {
-        return vertex;
+        return allVertex;
     }
 
     std::vector<std::pair<char, char>> getEdges() {
         std::vector<std::pair<char, char>> result;
-        for (size_t i = 0; i < vertex.size(); i++) {
-            for (size_t j = i + 1; j < vertex.size(); j++) {
-                result.push_back({vertex[i], vertex[j]});
+        for (size_t i = 0; i < allVertex.size(); i++) {
+            for (size_t j = i + 1; j < allVertex.size(); j++) {
+                result.push_back({allVertex[i], allVertex[j]});
             }
         }
         return result;
@@ -68,7 +97,7 @@ public:
 
 
 private:
-    std::vector<char> vertex;
+    std::vector<char> allVertex;
 
 };
 
@@ -80,6 +109,12 @@ public:
     TSimpleOptions(std::vector<std::string> edgesPairs)
     {
         for (const auto& i: edgesPairs) {
+            if (i.size() != 2) {
+                throw std::invalid_argument("Edge name must be two letters length");
+            }
+            if (!('A' <= i[0] && i[0] <= 'Z' && 'A' <= i[1] && i[1] <= 'Z')) {
+                throw std::invalid_argument("Edge name must be two uppercase latin letter");
+            }
             vertex.push_back(i[0]);
             vertex.push_back(i[1]);
             edges.push_back({i[0], i[1]});
@@ -110,7 +145,16 @@ public:
     }
     
     TWeightedOptions(std::vector<std::string> edgesPairs, std::vector<int> weights) {
+        if (edgesPairs.size() != weights.size()) {
+            throw std::invalid_argument("The number of edges and weights must be the same");
+        }
         for (size_t i = 0; i < edgesPairs.size(); i++) {
+            if (edgesPairs[i].size() != 2) {
+                throw std::invalid_argument("Edge name must be two letters length");
+            }
+            if (!('A' <= edgesPairs[i][0] && edgesPairs[i][0] <= 'Z' && 'A' <= edgesPairs[i][1] && edgesPairs[i][1] <= 'Z')) {
+                throw std::invalid_argument("Edge name must be two uppercase latin letter");
+            }
             vertex.push_back(edgesPairs[i][0]);
             vertex.push_back(edgesPairs[i][1]);
             edgesWithWeights.push_back({{edgesPairs[i][0], edgesPairs[i][1]}, weights[i]});

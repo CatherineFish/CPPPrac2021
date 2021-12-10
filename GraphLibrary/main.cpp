@@ -26,21 +26,51 @@ TEST(GraphsCreation, noExceptionTest)
 	ASSERT_NO_THROW(factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW)));
 }
 
+TEST(GraphsCreation, ExceptionTest)
+{
+	TFactory factory;
+	
+	//Wrong Vertex Name
+	std::vector<char> completeParam = {'7', '8', '9'};
+	ASSERT_THROW(factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam)), std::invalid_argument);
+
+	//Wrong Edge Name
+	std::vector<std::string> simpleParam_1 = {{"E7"}, {"FA"}, {"AB"}};
+	ASSERT_THROW(factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam_1)), std::invalid_argument);
+
+	std::vector<std::string> simpleParam_2 = {{"EM"}, {"F"}, {"AB"}};
+	ASSERT_THROW(factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam_2)), std::invalid_argument);
+
+	std::vector<std::string> simpleParam_3 = {{"EM"}, {"FA"}, {"ABC"}};
+	ASSERT_THROW(factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam_3)), std::invalid_argument);
+
+	//In Weighted Graph Wrong Edges And Weights Params Number
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}, {"LM"}};
+	std::vector<int> weightedParamW = {5, 6};
+	ASSERT_THROW(factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW)), std::invalid_argument);
+
+	//In Bipartite Graph intersection of vertices of two parts
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F','A'};
+	ASSERT_THROW(factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond)), std::invalid_argument);
+}
+
+
 int main(int argc, char * argv[]) {
 
 
 	testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-
+	
 	/*TFactory factory;
 	auto graphs = factory.GetAvailableGraphs();
 	for (const auto& gen : graphs) {
 		std::cout << gen << std::endl;
 	}
-	std::vector<char> first = {'A','B','C','D'};
+	std::vector<char> first = {'7','B','C','D'};
 	std::vector<char> second = {'E','F'};
 
-	std::vector<char> completeParam = {'A', 'B', 'F'};
+	std::vector<char> completeParam = {'7', 'B', 'F'};
 
 	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
 
@@ -52,7 +82,7 @@ int main(int argc, char * argv[]) {
 	// BipartiteGraph {{A, B, C, D}, {E, F}}
 
 
-	auto bVertex = bipartite->GetVertices();
+	/*auto bVertex = bipartite->GetVertices();
 	for (auto elem: bVertex) {
 		std::cout << elem << " ";
 	}
@@ -77,13 +107,13 @@ int main(int argc, char * argv[]) {
 	auto bipartite_2 = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(first_2, second_2));
 	auto bipartite_sum = *(dynamic_cast<TBipartiteGraph*>(bipartite.get())) + *(dynamic_cast<TBipartiteGraph*>(bipartite_2.get()));
 	std::cout << bipartite_sum->ToString() << std::endl;
-	
+	*/
 
 	
-	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	/*auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
 	std::cout << complete->ToString() << std::endl;
 	// CompleteGraph {A, B, F}
-
+	/*
 	auto cVertex = complete->GetVertices();
 	for (auto elem: cVertex) {
 		std::cout << elem << " ";
