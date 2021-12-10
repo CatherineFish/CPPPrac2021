@@ -82,7 +82,7 @@ TEST(GraphsMethods, toString)
 	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
 	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
 	std::ostringstream expectedS;
-    expectedS << "SimpleGraph {EF, FA}";
+    expectedS << "SimpleGraph {AF, EF}";
     std::string actualS = simple->ToString();
     std::string Sexpected = expectedS.str();
     EXPECT_EQ(Sexpected, actualS);
@@ -93,10 +93,84 @@ TEST(GraphsMethods, toString)
 	std::vector<int> weightedParamW = {5, 6};
 	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
 	std::ostringstream expectedW;
-    expectedW << "WeightedGraph {FD:5, ED:6}";
+    expectedW << "WeightedGraph {DE:6, DF:5}";
     std::string actualW = weighted->ToString();
     std::string Wexpected = expectedW.str();
     EXPECT_EQ(Wexpected, actualW);
+}
+
+TEST(GraphsMethods, GetVertices)
+{
+	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	auto Bvertex = bipartite->GetVertices();
+	std::vector<char> vertexB = {'A','B','C','D', 'E','F'} ;
+	EXPECT_EQ(Bvertex, vertexB);
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'A', 'B', 'F'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	auto Cvertex = complete->GetVertices();
+	std::vector<char> vertexC = {'A','B','F'}; 
+	EXPECT_EQ(Cvertex, vertexC);
+
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	auto Svertex = simple->GetVertices();
+	std::vector<char> vertexS = {'A','E','F'}; 
+	EXPECT_EQ(Svertex, vertexS);
+
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	auto Wvertex = weighted->GetVertices();
+	std::vector<char> vertexW = {'D','E','F'}; 
+	EXPECT_EQ(Wvertex, vertexW);
+
+}
+
+TEST(GraphsMethods, GetEdges)
+{
+	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	auto bipartite = factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond));
+	auto Bvertex = bipartite->GetEdges();
+	std::vector<std::pair<char,char>> vertexB = {{'A','E'}, {'A','F'}, {'B','E'}, {'B','F'}, {'C','E'}, {'C','F'}, {'D','E'}, {'D','F'}} ;
+	EXPECT_EQ(Bvertex, vertexB);
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'A', 'B', 'F'};
+	auto complete = factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam));
+	auto Cvertex = complete->GetEdges();
+	std::vector<std::pair<char,char>> vertexC = {{'A', 'B'}, {'A', 'F'}, {'B', 'F'}}; 
+	EXPECT_EQ(Cvertex, vertexC);
+
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
+	auto simple = factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam));
+	auto Svertex = simple->GetEdges();
+	std::vector<std::pair<char,char>> vertexS = {{'A', 'F'}, {'E','F'}}; 
+	EXPECT_EQ(Svertex, vertexS);
+
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	auto weighted = factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW));
+	auto Wvertex = weighted->GetEdges();
+	std::vector<std::pair<char,char>> vertexW = {{'D','E'},{'D', 'F'}}; 
+	EXPECT_EQ(Wvertex, vertexW);
+	
 }
 
 

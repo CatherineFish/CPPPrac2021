@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <string>
 
+
 class TOptions {
 public:
     virtual ~TOptions() {}
@@ -22,6 +23,8 @@ public:
             }
         }
 
+        std::sort(firstGroupOfVertex.begin(), firstGroupOfVertex.end());
+        firstGroupOfVertex.erase(std::unique(firstGroupOfVertex.begin(), firstGroupOfVertex.end()), firstGroupOfVertex.end());
         for (const auto& i: second) {
             auto it = find(firstGroupOfVertex.begin(), firstGroupOfVertex.end(), i);
             if (it != firstGroupOfVertex.end()) {
@@ -33,6 +36,9 @@ public:
                 throw std::invalid_argument("Vertex must be uppercase latin letter");
             }
         }
+        std::sort(secondGroupOfVertex.begin(), secondGroupOfVertex.end());
+        secondGroupOfVertex.erase(std::unique(secondGroupOfVertex.begin(), secondGroupOfVertex.end()), secondGroupOfVertex.end());
+        
         
     } 
     std::vector<char> getFirst() {
@@ -48,6 +54,7 @@ public:
         for (auto&i : secondGroupOfVertex) {
             result.push_back(i);
         }
+        std::sort(result.begin(), result.end());
         return result;
     }
 
@@ -79,6 +86,8 @@ public:
                 throw std::invalid_argument("Vertex must be uppercase latin letter");
             }
         }
+        std::sort(allVertex.begin(), allVertex.end());
+        allVertex.erase(std::unique(allVertex.begin(), allVertex.end()), allVertex.end());
     }
     
     std::vector<char> getVertex() {
@@ -106,6 +115,15 @@ class TSimpleOptions : public TOptions {
 public:
     virtual ~TSimpleOptions() override = default;
     
+    struct {
+        bool operator()(std::pair<char, char> a, std::pair<char, char> b) const {
+            if (a.first == b.first) {
+                return a.second < b.second; 
+            }
+            return (a.first < b.first); 
+        }
+    } simpleCustomLess;
+
     TSimpleOptions(std::vector<std::string> edgesPairs)
     {
         for (const auto& i: edgesPairs) {
@@ -115,12 +133,21 @@ public:
             if (!('A' <= i[0] && i[0] <= 'Z' && 'A' <= i[1] && i[1] <= 'Z')) {
                 throw std::invalid_argument("Edge name must be two uppercase latin letter");
             }
-            vertex.push_back(i[0]);
-            vertex.push_back(i[1]);
-            edges.push_back({i[0], i[1]});
+            if (i[0] < i[1]) {
+                vertex.push_back(i[0]);
+                vertex.push_back(i[1]);
+                edges.push_back({i[0], i[1]});
+            } else {
+                vertex.push_back(i[1]);
+                vertex.push_back(i[0]);
+                edges.push_back({i[1], i[0]});
+            }
+            
         }
+        std::sort(edges.begin(), edges.end(), simpleCustomLess);
         std::sort(vertex.begin(), vertex.end());
         vertex.erase(std::unique(vertex.begin(), vertex.end()), vertex.end());
+    
     }
 
     std::vector<std::pair<char, char>> getEdges() {
@@ -143,7 +170,15 @@ class TWeightedOptions : public TOptions {
 public:
     virtual ~TWeightedOptions() override{
     }
-    
+    struct {
+        bool operator()(std::pair<std::pair<char, char>, int> a, std::pair<std::pair<char, char>, int> b) const { 
+            if (a.first.first == b.first.first) {
+                return (a.first.second < b.first.second);
+            }
+            return a.first.first < b.first.first; 
+        }
+    } customLess;
+
     TWeightedOptions(std::vector<std::string> edgesPairs, std::vector<int> weights) {
         if (edgesPairs.size() != weights.size()) {
             throw std::invalid_argument("The number of edges and weights must be the same");
@@ -155,11 +190,20 @@ public:
             if (!('A' <= edgesPairs[i][0] && edgesPairs[i][0] <= 'Z' && 'A' <= edgesPairs[i][1] && edgesPairs[i][1] <= 'Z')) {
                 throw std::invalid_argument("Edge name must be two uppercase latin letter");
             }
-            vertex.push_back(edgesPairs[i][0]);
-            vertex.push_back(edgesPairs[i][1]);
-            edgesWithWeights.push_back({{edgesPairs[i][0], edgesPairs[i][1]}, weights[i]});
+            if (edgesPairs[i][0] < edgesPairs[i][1]) {
+                vertex.push_back(edgesPairs[i][0]);
+                vertex.push_back(edgesPairs[i][1]);
+                edgesWithWeights.push_back({{edgesPairs[i][0], edgesPairs[i][1]}, weights[i]});
+            } else {
+                vertex.push_back(edgesPairs[i][1]);
+                vertex.push_back(edgesPairs[i][0]);
+                edgesWithWeights.push_back({{edgesPairs[i][1], edgesPairs[i][0]}, weights[i]});
+            }
+            
 
         }
+
+        std::sort(edgesWithWeights.begin(), edgesWithWeights.end(), customLess);
         std::sort(vertex.begin(), vertex.end());
         vertex.erase(std::unique(vertex.begin(), vertex.end()), vertex.end());
     
