@@ -1,9 +1,38 @@
 #include <cassert>
 #include <iostream>
+#include <gtest/gtest.h>
 #include "factory.h"
 
-int main() {
+TEST(GraphsCreation, noExceptionTest)
+{
 	TFactory factory;
+	
+	//Bipartite Graph
+	std::vector<char> bipartParamFirst = {'A','B','C','D'};
+	std::vector<char> bipartParamSecond = {'E','F'};
+	ASSERT_NO_THROW(factory.Create("bipartite", std::make_unique<TBipartiteOptions>(bipartParamFirst, bipartParamSecond)));
+	
+	//Complete Graph
+	std::vector<char> completeParam = {'A', 'B', 'F'};
+	ASSERT_NO_THROW(factory.Create("complete", std::make_unique<TCompleteOptions>(completeParam)));
+	
+	//SimpleGraph
+	std::vector<std::string> simpleParam = {{"EF"}, {"FA"}};
+	ASSERT_NO_THROW(factory.Create("simple", std::make_unique<TSimpleOptions>(simpleParam)));
+	
+	//Weighted Graph
+	std::vector<std::string> weightedParamEdges = {{"FD"}, {"ED"}};
+	std::vector<int> weightedParamW = {5, 6};
+	ASSERT_NO_THROW(factory.Create("weighted", std::make_unique<TWeightedOptions>(weightedParamEdges, weightedParamW)));
+}
+
+int main(int argc, char * argv[]) {
+
+
+	testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+
+	/*TFactory factory;
 	auto graphs = factory.GetAvailableGraphs();
 	for (const auto& gen : graphs) {
 		std::cout << gen << std::endl;
@@ -134,7 +163,7 @@ int main() {
 	
 	auto weighted_sum = *(dynamic_cast<TWeightedGraph*>(weighted.get())) + *(dynamic_cast<TWeightedGraph*>(weighted_2.get()));
 	std::cout << weighted_sum->ToString() << std::endl;
-
+	*/
 
 
 }

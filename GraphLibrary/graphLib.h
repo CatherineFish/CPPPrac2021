@@ -143,6 +143,9 @@ private:
 };
 
 class TWeightedGraph;
+class TSimpleGraph;
+class TCompleteGraph;
+class TBipartiteGraph;
 
 class TGraph {
 public:
@@ -197,11 +200,18 @@ public:
         return std::make_unique<TWeightedGraph>(std::make_unique<TWeightedOptions>(newEdges, newWeights));
     }
 
+
+
     friend std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TWeightedGraph &secondGraph);
     friend std::unique_ptr<TWeightedGraph> operator+ (TWeightedGraph &firstGraph, TGraph &secondGraph);
+
+    friend std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TSimpleGraph &secondGraph);
+    friend std::unique_ptr<TWeightedGraph> operator- (TWeightedGraph &firstGraph, TCompleteGraph &secondGraph);
+    std::unique_ptr<TOpt> vertexAndWeightedEdges;
     
 private:
-    std::unique_ptr<TOpt> vertexAndWeightedEdges;
 };
 
 
@@ -255,9 +265,18 @@ public:
 
     friend std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TBipartiteGraph &secondGraph);
     friend std::unique_ptr<TBipartiteGraph> operator+ (TBipartiteGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TBipartiteGraph &firstGraph, TSimpleGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TBipartiteGraph &firstGraph, TCompleteGraph &secondGraph);
+    
+    friend std::unique_ptr<TBipartiteGraph> operator- (TBipartiteGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TBipartiteGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TBipartiteGraph &firstGraph, TSimpleGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TBipartiteGraph &firstGraph, TCompleteGraph &secondGraph);
+    
+
+    std::unique_ptr<TOpt> vertexVectors;
     
 private:
-    std::unique_ptr<TOpt> vertexVectors;
 };
 
 class TCompleteGraph : public TGraph{
@@ -300,11 +319,19 @@ public:
 
     friend std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TCompleteGraph &secondGraph);
     friend std::unique_ptr<TCompleteGraph> operator+ (TCompleteGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TCompleteGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TCompleteGraph &firstGraph, TSimpleGraph &secondGraph);
     
+    friend std::unique_ptr<TCompleteGraph> operator- (TCompleteGraph &firstGraph, TCompleteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TCompleteGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TCompleteGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TCompleteGraph &firstGraph, TSimpleGraph &secondGraph);
+    
+
+    std::unique_ptr<TOpt> vertex;
 
 
 private:
-    std::unique_ptr<TOpt> vertex;
 };
 
 class TSimpleGraph : public TGraph{
@@ -347,9 +374,19 @@ public:
     }
 
     friend std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TCompleteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator+ (TSimpleGraph &firstGraph, TSimpleGraph &secondGraph);
+    
+    friend std::unique_ptr<TSimpleGraph> operator- (TSimpleGraph &firstGraph, TWeightedGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TSimpleGraph &firstGraph, TBipartiteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TSimpleGraph &firstGraph, TCompleteGraph &secondGraph);
+    friend std::unique_ptr<TSimpleGraph> operator- (TSimpleGraph &firstGraph, TSimpleGraph &secondGraph);
+    
+    std::unique_ptr<TOpt> edges;
+    
     
 private:
-    std::unique_ptr<TOpt> edges;
     
 };
 
